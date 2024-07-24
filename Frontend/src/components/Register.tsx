@@ -1,101 +1,286 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import React from "react";
-import { Link } from "react-router-dom";
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { IconBrandGoogle } from "@tabler/icons-react";
+import axios from "axios";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-export function Register() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Form submitted");
-  };
-  const onSuccess = (response: any) => {
-        console.log('Login Success: currentUser:', response.profileObj);
-        console.log('Name:', response.profileObj.name);
-        console.log('Email:', response.profileObj.email);
-    };
 
-    const onError = () => {
-      console.log('Login Failed');
+export function Register() {
+  return (
+    <GoogleOAuthProvider clientId="772509586103-5h4f5vu58sv9cqkon7jbq63m68nsoh5m.apps.googleusercontent.com">
+      <Signup />
+    </GoogleOAuthProvider>
+  );
+}
+
+function Signup() {
+  const navigate = useNavigate()
+  const [otp, setOtp] = useState<number>(0);
+  const [showOtp, setShowOtp] = useState<boolean>(false);
+  const [userOtp, setUserOtp] = useState<string>('');
+  const [formData, setFormData] = useState({
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState({
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: '',
+    otp: ''
+  });
+
+  const validateForm = () => {
+    const newErrors = {
+      firstname: '',
+      lastname: '',
+      email: '',
+      password: '',
+      otp: ''
+    };
+    let isValid = true;
+    
+    if (!formData.firstname) {
+      newErrors.firstname = 'First name is required';
+      isValid = false;
+    }
+    if (!formData.lastname) {
+      newErrors.lastname = 'Last name is required';
+      isValid = false;
+    }
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+      isValid = false;
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      isValid = false;
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+      isValid = false;
+    } else if (!/[a-z]/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one lowercase letter';
+      isValid = false;
+    } else if (!/[0-9]/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one number';
+      isValid = false;
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one symbol';
+      isValid = false;
+    }
+    if (showOtp && !userOtp) {
+      newErrors.otp = 'OTP is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
+
+  const generateOtp = () => {
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    console.log("Generated OTP:", otp);
+    return otp;
+  };
+
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (validateForm()) {
+      if (!showOtp) {
+        const generatedOtp = generateOtp();
+        setOtp(generatedOtp);
+        setShowOtp(true);
+        console.log("Form Data to be confirmed:", formData);
+      } else {
+        // Validate OTP
+        if (parseInt(userOtp) === otp) {
+          try {
+            const res = await axios.post("http://localhost:8080/users",formData)
+            if (res.status==201){
+              navigate("/auth/login")
+              console.log("Login Success")
+
+            }
+            else{
+              console.log("Login Failure")
+            }
+          } catch (error) {
+            console.log("Login error")
+          }
+          
+        } else {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            otp: 'Invalid OTP'
+          }));
+        }
+      }
+    }
+  };
+
+  const fetchUserInfo = async (accessToken: string) => {
+    try {
+      const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const userInfo = await response.json();
+      console.log('User Details:', userInfo);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  };
+
+  const onError = () => {
+    console.log('Login Failed');
+  };
+
+  const handleGoogleLogin = () => {
+    handleGoogle();
+  };
+
+  const handleGoogle = useGoogleLogin({
+    onSuccess: tokenResponse => {
+      console.log('Login Success: ', tokenResponse);
+      // Use the access token to fetch user details
+      fetchUserInfo(tokenResponse.access_token);
+    },
+    onError: onError,
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [id]: value
+    }));
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      [id]: ''
+    }));
+  };
+
   return (
     <div className="h-screen w-screen flex justify-center items-center">
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
-      <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-        Welcome to Intelliventory
-      </h2>
-      <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-        Please register to become a user.
-      </p>
+      <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+        <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
+          Welcome to Intelliventory
+        </h2>
+        <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+          Please register to become a user.
+        </p>
 
-      <form className="my-8" onSubmit={handleSubmit}>
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-          <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
-            <Input id="firstname" placeholder="Vignesh" type="text" />
-          </LabelInputContainer>
-          <LabelInputContainer>
-            <Label htmlFor="lastname">Last name</Label>
-            <Input id="lastname" placeholder="Vasu" type="text" />
-          </LabelInputContainer>
-        </div>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="iambatman@gotham.com" type="email" />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
-        </LabelInputContainer>
-        
-
-        <button
-          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-          type="submit"
-        >
-          Sign up &rarr;
-          <BottomGradient />
-        </button>
-
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-        <div className="flex flex-col space-y-4">
-        <GoogleOAuthProvider clientId="772509586103-8bofjpckjjkgdjgtta7l0reua9dqpt8e.apps.googleusercontent.com">
-            <div className="login-page">
-                
-                <GoogleLogin
-                    onSuccess={onSuccess}
-                    onError={onError}
+        <form className="my-8" onSubmit={handleSubmit}>
+          {!showOtp ? (
+            <>
+              <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+                <LabelInputContainer>
+                  <Label htmlFor="firstname">First name</Label>
+                  <Input
+                    id="firstname"
+                    placeholder="Vignesh"
+                    type="text"
+                    value={formData.firstname}
+                    onChange={handleInputChange}
+                  />
+                  {errors.firstname && <span className="text-red-600 text-sm">{errors.firstname}</span>}
+                </LabelInputContainer>
+                <LabelInputContainer>
+                  <Label htmlFor="lastname">Last name</Label>
+                  <Input
+                    id="lastname"
+                    placeholder="Vasu"
+                    type="text"
+                    value={formData.lastname}
+                    onChange={handleInputChange}
+                  />
+                  {errors.lastname && <span className="text-red-600 text-sm">{errors.lastname}</span>}
+                </LabelInputContainer>
+              </div>
+              <LabelInputContainer className="mb-4">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  placeholder="iambatman@gotham.com"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                 />
-                
-            </div>
-        </GoogleOAuthProvider>
-          {/* <button
-            className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+                {errors.email && <span className="text-red-600 text-sm">{errors.email}</span>}
+              </LabelInputContainer>
+              <LabelInputContainer className="mb-4">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  placeholder="••••••••"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
+                {errors.password && <span className="text-red-600 text-sm">{errors.password}</span>}
+              </LabelInputContainer>
+            </>
+          ) : (
+            <LabelInputContainer className="mb-4">
+              <Label htmlFor="otp">Enter OTP</Label>
+              <Input
+                id="otp"
+                placeholder="Enter the OTP"
+                type="text"
+                value={userOtp}
+                onChange={(e) => setUserOtp(e.target.value)}
+              />
+              {errors.otp && <span className="text-red-600 text-sm">{errors.otp}</span>}
+            </LabelInputContainer>
+          )}
+          <button
+            className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
             type="submit"
           >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Google
-            </span>
+            {showOtp ? 'Verify OTP & Submit' : 'Submit'}
             <BottomGradient />
-          </button> */}
-          
-        </div>
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-        <p className="text-center text-neutral-600 text-sm max-w-sm dark:text-neutral-300 mb-2">Existing User</p>
-        <button
-          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-          type="submit"
-        >
-            <Link to="/auth/login" >
-          Sign in
+          </button>
+
+          <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
+          <div className="flex flex-col space-y-4">
+            <button
+              className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+              onClick={handleGoogleLogin}
+            >
+              <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                Google
+              </span>
+              <BottomGradient />
+            </button>
+          </div>
+
+          <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+          <p className="text-center text-neutral-600 text-sm max-w-sm dark:text-neutral-300 mb-2">Existing User</p>
+          <Link to="/auth/login">
+            <button
+              className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+              type="button"
+            >
+              Sign in
+              <BottomGradient />
+            </button>
           </Link>
-          <BottomGradient />
-        </button>
-      </form>
-    </div>
+        </form>
+      </div>
     </div>
   );
 }
