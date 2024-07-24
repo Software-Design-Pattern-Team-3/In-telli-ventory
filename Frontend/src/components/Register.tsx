@@ -1,17 +1,23 @@
 "use client";
 import { cn } from "@/lib/utils";
-import {
-    IconBrandGoogle
-} from "@tabler/icons-react";
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import React from "react";
+import { Link } from "react-router-dom";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Link } from "react-router-dom";
-
 export function Register() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted");
+  };
+  const onSuccess = (response: any) => {
+        console.log('Login Success: currentUser:', response.profileObj);
+        console.log('Name:', response.profileObj.name);
+        console.log('Email:', response.profileObj.email);
+    };
+
+    const onError = () => {
+      console.log('Login Failed');
   };
   return (
     <div className="h-screen w-screen flex justify-center items-center">
@@ -55,8 +61,17 @@ export function Register() {
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <div className="flex flex-col space-y-4">
-          
-          <button
+        <GoogleOAuthProvider clientId="772509586103-8bofjpckjjkgdjgtta7l0reua9dqpt8e.apps.googleusercontent.com">
+            <div className="login-page">
+                
+                <GoogleLogin
+                    onSuccess={onSuccess}
+                    onError={onError}
+                />
+                
+            </div>
+        </GoogleOAuthProvider>
+          {/* <button
             className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
             type="submit"
           >
@@ -65,7 +80,7 @@ export function Register() {
               Google
             </span>
             <BottomGradient />
-          </button>
+          </button> */}
           
         </div>
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
