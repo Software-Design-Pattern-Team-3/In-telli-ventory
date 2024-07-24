@@ -36,6 +36,10 @@ public class UserService {
         
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
     public User updateUser(long id, User user) {
         
         User existingUser = userRepository.findById(id).orElse(null);
@@ -58,5 +62,7 @@ public class UserService {
         userRepository.deleteById(id);
         return "user with id "+id+" has been deleted success.";
     }
+
+   
 }
 
