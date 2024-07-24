@@ -94,31 +94,53 @@ function Signup() {
     return otp;
   };
 
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+  
     if (validateForm()) {
       if (!showOtp) {
-        const generatedOtp = generateOtp();
-        setOtp(generatedOtp);
-        setShowOtp(true);
-        console.log("Form Data to be confirmed:", formData);
+        try {
+          // Check if the email already exists in the database
+          const response = await axios.get("http://localhost:8080/users", {
+            params: { email: formData.email }
+          });
+  
+          // Check if any user exists with the provided email
+          if (response.data && response.data.length > 0) {
+            // Email exists, remind user to login
+            console.log("Email already exists. Please login.");
+            setErrors(prevErrors => ({
+              ...prevErrors,
+              email: 'Email already exists. Please login.'
+            }));
+          } else {
+            // Email does not exist, generate and show OTP
+            const generatedOtp = generateOtp();
+            setOtp(generatedOtp);
+            setShowOtp(true);
+            await axios.post("/api/send-otp", {
+              email: formData.email,
+              otp: generatedOtp
+            });
+            console.log("Form Data to be confirmed:", formData);
+          }
+        } catch (error) {
+          console.error("Error checking email existence:", error);
+        }
       } else {
         // Validate OTP
         if (parseInt(userOtp) === otp) {
           try {
-            const res = await axios.post("http://localhost:8080/users",formData)
-            if (res.status==201){
-              navigate("/auth/login")
-              console.log("Login Success")
-
-            }
-            else{
-              console.log("Login Failure")
+            const res = await axios.post("http://localhost:8080/users", formData);
+            if (res.status === 201) {
+              navigate("/auth/login");
+              console.log("Registration Success");
+            } else {
+              console.log("Registration Failure");
             }
           } catch (error) {
-            console.log("Login error")
+            console.error("Error submitting form:", error);
           }
-          
         } else {
           setErrors(prevErrors => ({
             ...prevErrors,
@@ -128,6 +150,7 @@ function Signup() {
       }
     }
   };
+  
 
   const fetchUserInfo = async (accessToken: string) => {
     try {
