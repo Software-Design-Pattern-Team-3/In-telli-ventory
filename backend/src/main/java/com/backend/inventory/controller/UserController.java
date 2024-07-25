@@ -1,28 +1,25 @@
 package com.backend.inventory.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.backend.inventory.exception.EmailAlreadyRegisteredException;
-import com.backend.inventory.model.User;
-import com.backend.inventory.service.UserService;
-
-import io.micrometer.core.ipc.http.HttpSender.Response;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.backend.inventory.exception.EmailAlreadyRegisteredException;
+import com.backend.inventory.model.User;
+import com.backend.inventory.service.EmailService;
+import com.backend.inventory.service.UserService;
 
 @RestController
 @RequestMapping("/users")
@@ -67,19 +64,22 @@ public class UserController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
-        try {
-            User user = userService.getUserByEmail(email);
-            if (user != null) {
-                return new ResponseEntity<>(user, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
+    try {
+        User user = userService.getUserByEmail(email);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-     } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+    } catch (Exception e) {
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
+    @GetMapping("/cron")
+public ResponseEntity<String> getUserByCron() {
+    return new ResponseEntity<>("Hi There", HttpStatus.OK);
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable long id) {
@@ -104,6 +104,27 @@ public class UserController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
+        }
+    }
+    @Autowired
+    private EmailService emailService;
+
+    // ... existing methods ...
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String otp = body.get("otp");
+
+        if (email == null || otp == null) {
+            return new ResponseEntity<>("Email and OTP are required", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            emailService.sendOtpEmail(email, otp);
+            return new ResponseEntity<>("OTP sent successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to send OTP: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
