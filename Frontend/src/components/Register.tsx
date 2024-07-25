@@ -173,10 +173,54 @@ function Signup() {
       });
       const userInfo = await response.json();
       console.log('User Details:', userInfo);
+  
+      // Check if email exists in backend
+      try {
+        const emailCheckResponse = await axios.get("http://localhost:8080/users/email", {
+          params: { email: userInfo.email }
+        });
+  
+        // If email exists, set error message
+        setErrors(prevErrors => ({
+          ...prevErrors,
+          email: 'Email already exists. Please login.'
+        }));
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          // Email doesn't exist, proceed to send user data to backend
+          const formData = {
+            firstname: userInfo.given_name,
+            lastname: userInfo.family_name,
+            email: userInfo.email,
+            password: userInfo.picture // Using picture URL as password
+          };
+  
+          try {
+            const res = await axios.post("http://localhost:8080/users", formData);
+            if (res.status === 201) {
+              navigate("/auth/login");
+              console.log("Registration Success");
+            } else {
+              console.log("Registration Failure");
+            }
+          } catch (error) {
+            console.error("Error submitting form:", error);
+          }
+        } else {
+          // Handle other errors
+          console.error("Error checking email existence:", error);
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            email: 'An error occurred. Please try again.'
+          }));
+        }
+      }
     } catch (error) {
       console.error('Error fetching user info:', error);
     }
   };
+  
+
 
   const onError = () => {
     console.log('Login Failed');
@@ -293,7 +337,7 @@ function Signup() {
           <div className="flex flex-col space-y-4">
             <button
               className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              onClick={handleGoogleLogin}
+              onClick={handleGoogleLogin} type="button"
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-neutral-700 dark:text-neutral-300 text-sm">
