@@ -23,7 +23,7 @@ import com.backend.inventory.service.UserService;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin("*")
 public class UserController {
 
     @Autowired
