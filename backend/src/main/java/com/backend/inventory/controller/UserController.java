@@ -23,11 +23,18 @@ import com.backend.inventory.service.UserService;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin("*")
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
+
+    // ... existing methods ...
+
+    
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
@@ -125,10 +132,9 @@ public ResponseEntity<?> loginUser(@RequestBody Map<String, String> credentials)
 
         }
     }
-    @Autowired
-    private EmailService emailService;
 
-    // ... existing methods ...
+
+    
 
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
