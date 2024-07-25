@@ -100,32 +100,44 @@ function Signup() {
     if (validateForm()) {
       if (!showOtp) {
         try {
-          // Check if the email already exists in the database
-          const response = await axios.get("http://localhost:8080/users", {
+          const response = await axios.get("http://localhost:8080/users/email", {
             params: { email: formData.email }
           });
   
-          // Check if any user exists with the provided email
-          if (response.data && response.data.length > 0) {
-            // Email exists, remind user to login
-            console.log("Email already exists. Please login.");
-            setErrors(prevErrors => ({
-              ...prevErrors,
-              email: 'Email already exists. Please login.'
-            }));
-          } else {
-            // Email does not exist, generate and show OTP
+          // If we reach here, it means the email exists
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            email: 'Email already exists. Please login.'
+          }));
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status === 404) {
+            // Email doesn't exist, proceed with OTP generation
             const generatedOtp = generateOtp();
             setOtp(generatedOtp);
             setShowOtp(true);
-            await axios.post("/api/send-otp", {
-              email: formData.email,
-              otp: generatedOtp
-            });
-            console.log("Form Data to be confirmed:", formData);
+            
+            // Send OTP to backend for email delivery
+            try {
+              await axios.post("http://localhost:8080/users/send-otp", {
+                email: formData.email,
+                otp: generatedOtp
+              });
+              console.log("OTP sent successfully");
+            } catch (otpError) {
+              console.error("Error sending OTP:", otpError);
+              setErrors(prevErrors => ({
+                ...prevErrors,
+                email: 'Failed to send OTP. Please try again.'
+              }));
+            }
+          } else {
+            // Handle other errors
+            console.error("Error checking email existence:", error);
+            setErrors(prevErrors => ({
+              ...prevErrors,
+              email: 'An error occurred. Please try again.'
+            }));
           }
-        } catch (error) {
-          console.error("Error checking email existence:", error);
         }
       } else {
         // Validate OTP
