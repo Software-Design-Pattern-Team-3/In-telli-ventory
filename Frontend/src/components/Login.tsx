@@ -25,14 +25,14 @@ function Signin() {
     e.preventDefault();
 
     try {
-      const res = await axios.get("http://localhost:8080/users/email", { params: { email: formData.email } });
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/email`, { params: { email: formData.email } });
       const user = res.data;
 
       if (user.password.includes("googleusercontent")) {
         setErrors({ ...errors, email: "Google account found. Please login with Google." });
       } else {
         // Proceed with normal login
-        const loginRes = await axios.post("http://localhost:8080/users/login", formData);
+        const loginRes = await axios.post(`${process.env.REACT_APP_API_URL}/users/login`, formData);
         if (loginRes.status === 200) {
           navigate("/");
         }
@@ -56,7 +56,7 @@ function Signin() {
       const userInfo = await response.json();
       console.log('User Details:', userInfo);
 
-      const emailCheckResponse = await axios.get("http://localhost:8080/users/email", {
+      const emailCheckResponse = await axios.get(`${process.env.REACT_APP_API_URL}/users/email`, {
         params: { email: userInfo.email },
       });
 
