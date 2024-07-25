@@ -29,6 +29,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EmailService emailService;
+
+    // ... existing methods ...
+
     
 
     @PostMapping
@@ -109,11 +114,8 @@ public ResponseEntity<String> getUserByCron() {
         }
     }
 
-    
-    @Autowired
-    private EmailService emailService;
 
-    // ... existing methods ...
+    
 
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
