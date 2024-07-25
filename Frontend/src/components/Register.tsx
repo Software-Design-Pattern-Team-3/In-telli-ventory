@@ -99,7 +99,8 @@ function Signup() {
     if (validateForm()) {
       if (!showOtp) {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/email`, {
+          const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
+}/users/email`, {
             params: { email: formData.email }
           });
           console.log(response)
@@ -117,7 +118,8 @@ function Signup() {
             
             // Send OTP to backend for email delivery
             try {
-              await axios.post(`${process.env.REACT_APP_API_URL}/users/send-otp`, {
+              await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL
+}/users/send-otp`, {
                 email: formData.email,
                 otp: generatedOtp
               });
@@ -142,7 +144,8 @@ function Signup() {
         // Validate OTP
         if (parseInt(userOtp) === otp) {
           try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/users`, formData);
+            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL
+}/users`, formData);
             if (res.status === 201) {
               navigate("/auth/login");
               console.log("Registration Success");
@@ -175,7 +178,8 @@ function Signup() {
   
       // Check if email exists in backend
       try {
-        const emailCheckResponse = await axios.get(`${process.env.REACT_APP_API_URL}/users/email`, {
+        const emailCheckResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
+}/users/email`, {
           params: { email: userInfo.email }
         });
         console.log(emailCheckResponse)
@@ -195,7 +199,8 @@ function Signup() {
           };
   
           try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/users`, formData);
+            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL
+}/users`, formData);
             if (res.status === 201) {
               navigate("/auth/login");
               console.log("Registration Success");
