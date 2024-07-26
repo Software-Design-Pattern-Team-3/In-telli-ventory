@@ -8,9 +8,7 @@ function App() {
 
   return (
     <>
-    <p>
     
-    </p>
       <BrowserRouter>
       <Routes>
           <Route path="/" element={<Home/>}/>
