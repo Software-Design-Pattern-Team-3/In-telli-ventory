@@ -1,5 +1,6 @@
+// Login.tsx
 "use client";
-import { cn } from "@/lib/utils";
+import { useUser } from "@/global/useUser";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import { IconBrandGoogle } from "@tabler/icons-react";
 import axios from "axios";
@@ -20,22 +21,24 @@ function Signin() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "" });
- 
 
+  const { user, setUser } = useUser();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
-}/users/email`, { params: { email: formData.email } });
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/users/email`, { params: { email: formData.email } });
       const user = res.data;
-      console.log(user)
       if (user.password.includes("googleusercontent")) {
         setErrors({ ...errors, email: "Google account found. Please login with Google." });
       } else {
-        // Proceed with normal login
         const loginRes = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/users/login`, formData);
         if (loginRes.status === 200) {
+          setUser({
+            name: user.firstname,
+            email: formData.email,
+            picture: "none",
+          });
           navigate("/dashboard");
         }
       }
@@ -56,15 +59,18 @@ function Signin() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const userInfo = await response.json();
-      console.log('User Details:', userInfo);
-
-      const emailCheckResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
-}/users/email`, {
+      const emailCheckResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/users/email`, {
         params: { email: userInfo.email },
       });
 
       const user = emailCheckResponse.data;
+      console.log("Loginned user",user)
       if (user.password.includes("googleusercontent")) {
+        setUser({
+          name: userInfo.name,
+          email: user.email,
+          picture: userInfo.picture,
+        });
         navigate("/dashboard");
       } else {
         setErrors({ ...errors, email: "Account wasn't created using Google. Enter credentials." });
@@ -80,14 +86,11 @@ function Signin() {
   };
 
   const handleGoogleLogin = () => {
-    // console.log(navurl)
     handleGoogle();
   };
 
   const handleGoogle = useGoogleLogin({
     onSuccess: tokenResponse => {
-      console.log('Login Success: ', tokenResponse);
-      // Use the access token to fetch user details
       fetchUserInfo(tokenResponse.access_token);
     },
     onError: onError,
@@ -138,6 +141,7 @@ function Signin() {
           <div className="flex flex-col space-y-4">
             <button
               className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+              type="button"
               onClick={handleGoogleLogin}
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
@@ -168,21 +172,11 @@ const BottomGradient = () => {
   return (
     <>
       <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
-      <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+      <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-4 inset-x-0 left-1/2 -bottom-px bg-cyan-500" />
     </>
   );
 };
 
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      {children}
-    </div>
-  );
+const LabelInputContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, ...props }) => {
+  return <div {...props}>{children}</div>;
 };
