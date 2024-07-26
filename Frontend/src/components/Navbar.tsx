@@ -20,7 +20,7 @@ const applyTheme = (theme: string) => {
 export function NavbarDemo() {
   return (
     <div className="relative w-full flex items-center justify-center">
-      <Navbar className="top-2" />
+      <Navbar className="top-5" />
     </div>
   );
 }

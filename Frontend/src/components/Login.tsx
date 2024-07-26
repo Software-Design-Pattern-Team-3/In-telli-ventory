@@ -36,7 +36,7 @@ function Signin() {
         // Proceed with normal login
         const loginRes = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/users/login`, formData);
         if (loginRes.status === 200) {
-          navigate("/");
+          navigate("/dashboard");
         }
       }
     } catch (error) {
@@ -65,7 +65,7 @@ function Signin() {
 
       const user = emailCheckResponse.data;
       if (user.password.includes("googleusercontent")) {
-        navigate("/");
+        navigate("/dashboard");
       } else {
         setErrors({ ...errors, email: "Account wasn't created using Google. Enter credentials." });
       }
