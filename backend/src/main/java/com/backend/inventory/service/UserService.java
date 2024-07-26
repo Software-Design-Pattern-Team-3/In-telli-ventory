@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.inventory.exception.EmailAlreadyRegisteredException;
+import com.backend.inventory.model.Product;
 import com.backend.inventory.model.User;
 import com.backend.inventory.repository.UserRepository;
 
@@ -62,6 +63,8 @@ public class UserService {
         userRepository.deleteById(id);
         return "user with id "+id+" has been deleted success.";
     }
+
+    
 
    
 }

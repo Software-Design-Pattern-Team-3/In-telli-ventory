@@ -72,7 +72,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/email")
+@GetMapping("/email")
 public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
     try {
         User user = userService.getUserByEmail(email);
@@ -85,7 +85,9 @@ public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-    @GetMapping("/cron")
+
+
+@GetMapping("/cron")
 public ResponseEntity<String> getUserByCron() {
     return new ResponseEntity<>("Hi There", HttpStatus.OK);
 }
