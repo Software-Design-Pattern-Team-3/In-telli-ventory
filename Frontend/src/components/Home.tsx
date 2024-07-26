@@ -4,6 +4,7 @@ import {
   IconSignature,
   IconTableColumn,
 } from "@tabler/icons-react";
+import { Link } from "react-router-dom";
 import { NavbarDemo } from "./Navbar";
 import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
 import { SparklesCore } from "./ui/sparkles";
@@ -16,6 +17,7 @@ export default function Home() {
       <h1 className="md:text-7xl text-3xl lg:text-9xl font-bold text-center text-white relative z-20">
         StockSync
       </h1>
+      
       <div className="w-[40rem] h-40 relative">
         {/* Gradients */}
         <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-[2px] w-3/4 blur-sm" />
@@ -36,6 +38,11 @@ export default function Home() {
         {/* Radial Gradient to prevent sharp edges */}
         <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]"></div>
       </div>
+      <Link to="/auth/login">
+      <button className="w-40 h-10 rounded-xl bg-black border border-white  text-white text-sm">
+          Join now
+        </button>
+</Link>
 
     </div>
     {/* <HeroParallax products={products}/> */}
