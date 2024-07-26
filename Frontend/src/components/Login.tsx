@@ -20,19 +20,21 @@ function Signin() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "" });
+  // const navurl = import.meta.env.VITE_REACT_APP_API_URL
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const res = await axios.get("http://localhost:8080/users/email", { params: { email: formData.email } });
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
+}/users/email`, { params: { email: formData.email } });
       const user = res.data;
-
+      console.log(user)
       if (user.password.includes("googleusercontent")) {
         setErrors({ ...errors, email: "Google account found. Please login with Google." });
       } else {
         // Proceed with normal login
-        const loginRes = await axios.post("http://localhost:8080/users/login", formData);
+        const loginRes = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/users/login`, formData);
         if (loginRes.status === 200) {
           navigate("/");
         }
@@ -43,7 +45,7 @@ function Signin() {
       } else if (axios.isAxiosError(error) && error.response?.status === 401) {
         setErrors({ ...errors, password: "Invalid password" });
       } else {
-        console.error("Error logging in:", error);
+        console.error(`Error logging in:`, error);
       }
     }
   };
@@ -56,7 +58,8 @@ function Signin() {
       const userInfo = await response.json();
       console.log('User Details:', userInfo);
 
-      const emailCheckResponse = await axios.get("http://localhost:8080/users/email", {
+      const emailCheckResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
+}/users/email`, {
         params: { email: userInfo.email },
       });
 
@@ -77,6 +80,7 @@ function Signin() {
   };
 
   const handleGoogleLogin = () => {
+    // console.log(navurl)
     handleGoogle();
   };
 
