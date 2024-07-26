@@ -1,14 +1,17 @@
 "use client";
+import { useUser } from "@/global/useUser";
 import { cn } from "@/lib/utils";
 import {
-    IconArrowLeft,
-    IconBrandTabler,
-    IconSettings,
-    IconUserBolt,
+  IconArrowLeft,
+  IconBrandTabler,
+  IconMoon,
+  IconSettings,
+  IconSun,
+  IconUserBolt,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
 
 // Define the structure of each link
@@ -16,10 +19,40 @@ interface LinkItem {
   label: string;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
+  onClick?: (e:any) => void;
 }
 
 export default function SidebarDemo() {
+  const navigate = useNavigate()
+  const { user,logout} = useUser();
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
+  const applyTheme = (theme:any) => {
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
+  };
+  useEffect(() => {
+    applyTheme(theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+  const toggleTheme = () => {
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === "light" ? "dark" : "light";
+      applyTheme(newTheme);
+      localStorage.setItem("theme", newTheme);
+      return newTheme;
+    });
+  };
   const links: LinkItem[] = [
+    {
+      label: theme === "light" ? "Dark Mode" : "Light Mode",
+      href: "#",
+      icon: theme === "light" ? (
+        <IconMoon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ) : (
+        <IconSun className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+      onClick: toggleTheme,
+    },
     {
       label: "Dashboard",
       href: "#",
@@ -47,11 +80,34 @@ export default function SidebarDemo() {
       icon: (
         <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
+      onClick: (e) => {
+        e.preventDefault(); // Prevent default link behavior
+        logout();
+        navigate("/auth/login");
+      },
     },
   ];
 
   const [open, setOpen] = useState<boolean>(false);
-
+  const getAvatar = () => {
+    if (user.picture === "none") {
+      return (
+        <div className="h-7 w-7 flex-shrink-0 rounded-full bg-gray-500 text-white flex items-center justify-center">
+          {user.name.charAt(0).toUpperCase()}
+        </div>
+      );
+    } else {
+      return (
+        <img
+          src={user.picture}
+          className="h-7 w-7 flex-shrink-0 rounded-full"
+          width={50}
+          height={50}
+          alt="Avatar"
+        />
+      );
+    }
+  };
   return (
     <div
       className={cn(
@@ -71,16 +127,9 @@ export default function SidebarDemo() {
           <div>
             <SidebarLink
                           link={{
-                              label: "Manu Arora",
+                              label: user.name,
                               href: "#",
-                              icon: (
-                                  <img
-                                      src="https://assets.aceternity.com/manu.png"
-                                      className="h-7 w-7 flex-shrink-0 rounded-full"
-                                      width={50}
-                                      height={50}
-                                      alt="Avatar" />
-                              ),
+                              icon: getAvatar()
                           }}           />
           </div>
         </SidebarBody>
