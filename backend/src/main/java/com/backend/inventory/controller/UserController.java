@@ -20,6 +20,8 @@ import com.backend.inventory.exception.EmailAlreadyRegisteredException;
 import com.backend.inventory.model.User;
 import com.backend.inventory.service.EmailService;
 import com.backend.inventory.service.UserService;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 @RestController
 @RequestMapping("/users")
@@ -119,6 +121,20 @@ public ResponseEntity<?> loginUser(@RequestBody Map<String, String> credentials)
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+
+
+@PutMapping("/{id}")
+public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody User updatedUser) {
+    try {
+        User user = userService.updateUser(id, updatedUser);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    } catch (Exception e) {
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+
 
     @DeleteMapping
     public ResponseEntity<Void> deleteAllUsers() {
