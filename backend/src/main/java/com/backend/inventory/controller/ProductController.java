@@ -95,10 +95,6 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/drop-table")
-    public void dropProductTable() {
-        productService.dropProductTable();
-    }
     
 
 }

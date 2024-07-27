@@ -39,9 +39,7 @@ public class ProductService {
         return productRepository.findByType(type);
     }
 
-    public void dropProductTable() {
-        productRepository.dropProductTable();
-    }
+    
     
 
 

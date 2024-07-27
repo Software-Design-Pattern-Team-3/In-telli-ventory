@@ -16,9 +16,5 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findByBrand(String brand);
     List<Product> findByType(String type);
 
-    @Modifying
-    @Transactional
-    @Query(value = "DROP TABLE IF EXISTS product", nativeQuery = true)
-    void dropProductTable();
 
 }
