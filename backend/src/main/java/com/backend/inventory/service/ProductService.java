@@ -23,6 +23,25 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public List<Product> getProductsByCategory(String category) {
+        return productRepository.findByCategory(category);
+    }
+
+    public List<Product> getProductsBySubCategory(String subCategory) {
+        return productRepository.findBySubcategory(subCategory);
+    }
+
+    public List<Product> getProductsByBrand(String brand) {
+        return productRepository.findByBrand(brand);
+    }
+
+    public List<Product> getProductsByType(String type) {
+        return productRepository.findByType(type);
+    }
+
+    public void dropProductTable() {
+        productRepository.dropProductTable();
+    }
     
 
 
