@@ -15,13 +15,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Links, Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
 
 // Define the structure of each link
-interface LinkItem {
-  label: string;
-  href?: string; // Optional href for button-like actions
-  icon: React.JSX.Element | React.ReactNode;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // Only for button actions
-  type: 'button' | 'link'; // To distinguish between button and link actions
-}
+// interface LinkItem {
+//   label: string;
+//   href?: string; // Optional href for button-like actions
+//   icon: React.JSX.Element | React.ReactNode;
+//   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // Only for button actions
+//   type: 'button' | 'link'; // To distinguish between button and link actions
+// }
 
 export default function SidebarDemo() {
   const navigate = useNavigate();
