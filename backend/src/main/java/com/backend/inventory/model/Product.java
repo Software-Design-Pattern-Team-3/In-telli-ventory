@@ -29,6 +29,4 @@ public class Product {
     private float rating;
     private int purchases;
     private int stock;
-
-
 }
