@@ -1,6 +1,6 @@
+import { googleLogout } from '@react-oauth/google';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { UserContext, UserContextType } from './UserContext';
-
 interface User {
   name: string;
   email: string;
@@ -19,6 +19,9 @@ export function UserProvider({ children }: UserProviderProps) {
   });
 
   const logout = () => {
+    if (user.picture.includes("google")){
+      googleLogout();
+    }
     setUser({ name: '', email: '', picture: '' });
     localStorage.removeItem('user');
   };

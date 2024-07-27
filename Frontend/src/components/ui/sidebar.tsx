@@ -2,14 +2,26 @@ import { cn } from "@/lib/utils";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { createContext, useContext, useState } from "react";
-import { Link, LinkProps } from "react-router-dom"; // Updated import for React Router
+import { Link, LinkProps } from "react-router-dom";
 
-// Define the structure for links
-interface Links {
+interface ButtonLinkProps {
   label: string;
-  href: string;
+  href?: never; // `href` should not be present for buttons
   icon: React.JSX.Element | React.ReactNode;
+  type: 'button';
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
+
+interface AnchorLinkProps {
+  label: string;
+  href: string; // `href` is required for links
+  icon: React.JSX.Element | React.ReactNode;
+  type: 'link';
+  onClick?: never; // `onClick` should not be present for links
+}
+
+export type Links = ButtonLinkProps | AnchorLinkProps;
+
 
 // Define the structure of the Sidebar Context
 interface SidebarContextProps {
@@ -149,19 +161,23 @@ export const MobileSidebar: React.FC<React.ComponentProps<"div">> = ({
 
 // Sidebar Link Component
 export const SidebarLink: React.FC<{
-    link: Links;
-    className?: string;
-  } & Omit<LinkProps, 'to'>> = ({ link, className, ...props }) => {
-    const { open, animate } = useSidebar();
-    
+  link: Links;
+  className?: string;
+} & Omit<LinkProps, 'to'>> = ({ link, className, ...props }) => {
+  const { open, animate } = useSidebar();
+
+  const commonClasses = cn(
+    "flex items-center justify-start gap-2 group/sidebar py-2",
+    className
+  );
+
+  if (link.type === 'button') {
+    // Render as a button if type is 'button'
     return (
-      <Link
-        to={link.href}
-        className={cn(
-          "flex items-center justify-start gap-2 group/sidebar py-2",
-          className
-        )}
-        {...props}
+      <button
+        className={commonClasses}
+        onClick={link.onClick} // Correctly typed onClick
+        {...props as React.ButtonHTMLAttributes<HTMLButtonElement>} // Casting for button attributes
       >
         {link.icon}
         <motion.span
@@ -173,7 +189,27 @@ export const SidebarLink: React.FC<{
         >
           {link.label}
         </motion.span>
-      </Link>
+      </button>
     );
-  };
-  
+  }
+
+  // Render as a Link if type is 'link'
+  return (
+    <Link
+      to={link.href}
+      className={commonClasses}
+      {...props as Omit<LinkProps, 'to'>} // Exclude `to` from spread props
+    >
+      {link.icon}
+      <motion.span
+        animate={{
+          display: animate ? (open ? "inline-block" : "none") : "inline-block",
+          opacity: animate ? (open ? 1 : 0) : 1,
+        }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      >
+        {link.label}
+      </motion.span>
+    </Link>
+  );
+};
