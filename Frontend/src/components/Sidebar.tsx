@@ -12,29 +12,34 @@ import {
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
+import { Links, Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
 
 // Define the structure of each link
 interface LinkItem {
   label: string;
-  href: string;
+  href?: string; // Optional href for button-like actions
   icon: React.JSX.Element | React.ReactNode;
-  onClick?: (e:any) => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // Only for button actions
+  type: 'button' | 'link'; // To distinguish between button and link actions
 }
 
 export default function SidebarDemo() {
-  const navigate = useNavigate()
-  const { user,logout} = useUser();
+  const navigate = useNavigate();
+  const { user, logout } = useUser();
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
-  const applyTheme = (theme:any) => {
+
+  const applyTheme = (theme: string) => {
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
   };
+
   useEffect(() => {
     applyTheme(theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
-  const toggleTheme = () => {
+
+  const toggleTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevent default action
     setTheme((prevTheme) => {
       const newTheme = prevTheme === "light" ? "dark" : "light";
       applyTheme(newTheme);
@@ -42,49 +47,41 @@ export default function SidebarDemo() {
       return newTheme;
     });
   };
-  const links: LinkItem[] = [
+
+  const links: Links[] = [
     {
       label: theme === "light" ? "Dark Mode" : "Light Mode",
-      href: "#",
-      icon: theme === "light" ? (
-        <IconMoon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ) : (
-        <IconSun className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
+      icon: theme === "light" ? <IconMoon className="text-neutral-700 dark:text-neutral-200 h-5 w-5" /> : <IconSun className="text-neutral-700 dark:text-neutral-200 h-5 w-5" />,
       onClick: toggleTheme,
+      type: 'button',
     },
     {
       label: "Dashboard",
-      href: "#",
-      icon: (
-        <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
+      href: "/dashboard",
+      icon: <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      type: 'link',
     },
     {
       label: "Profile",
-      href: "#",
-      icon: (
-        <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
+      href: "/profile",
+      icon: <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      type: 'link',
     },
     {
       label: "Settings",
-      href: "#",
-      icon: (
-        <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
+      href: "/settings",
+      icon: <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      type: 'link',
     },
     {
       label: "Logout",
-      href: "#",
-      icon: (
-        <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-      onClick: (e) => {
+      icon: <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      onClick: (e:any) => {
         e.preventDefault(); // Prevent default link behavior
         logout();
         navigate("/auth/login");
       },
+      type: 'button',
     },
   ];
 
@@ -108,6 +105,7 @@ export default function SidebarDemo() {
       );
     }
   };
+
   return (
     <div
       className={cn(
@@ -126,11 +124,13 @@ export default function SidebarDemo() {
           </div>
           <div>
             <SidebarLink
-                          link={{
-                              label: user.name,
-                              href: "#",
-                              icon: getAvatar()
-                          }}           />
+              link={{
+                label: user.name,
+                href: "#", // Ensure href is defined
+                icon: getAvatar(),
+                type: 'link', // Since this is a profile link, treat it as a link
+              }}
+            />
           </div>
         </SidebarBody>
       </Sidebar>
