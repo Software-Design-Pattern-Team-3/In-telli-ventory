@@ -94,7 +94,7 @@ export const DesktopSidebar: React.FC<React.ComponentProps<typeof motion.div>> =
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-black w-[300px] flex-shrink-0",
         className
       )}
       animate={{
