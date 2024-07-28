@@ -55,46 +55,20 @@ public class ProductController {
         }
     }
     
-    @GetMapping("/category")
-    public ResponseEntity<List<Product>> getProductsByCategory(@RequestParam String category) {
+  
+    @GetMapping("/filter")
+    public ResponseEntity<List<Product>> getProductsByFilter(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String subcategory,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String type) {
         try {
-            List<Product> pro = productService.getProductsByCategory(category);
-            return new ResponseEntity<>(pro, HttpStatus.OK);
+            List<Product> products = productService.getProductsByFilter(category, subcategory, brand, type);
+            return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/subcategory")
-    public ResponseEntity<List<Product>> getProductsBySubCategory(@RequestParam String subCategory) {
-        try {
-            List<Product> pro = productService.getProductsBySubCategory(subCategory);
-            return new ResponseEntity<>(pro, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/brand")
-    public ResponseEntity<List<Product>> getProductsByBrand(@RequestParam String brand) {
-        try {
-            List<Product> pro = productService.getProductsByBrand(brand);
-            return new ResponseEntity<>(pro, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/type")
-    public ResponseEntity<List<Product>> getProductsByType(@RequestParam String type) {
-        try {
-            List<Product> pro = productService.getProductsByType(type);
-            return new ResponseEntity<>(pro, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     
 
 }
