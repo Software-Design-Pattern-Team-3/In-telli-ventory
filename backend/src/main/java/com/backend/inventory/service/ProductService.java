@@ -23,22 +23,22 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public List<Product> getProductsByCategory(String category) {
-        return productRepository.findByCategory(category);
+   
+    public List<Product> getProductsByFilter(String category, String subcategory, String brand, String type) {
+        if (category != null) {
+            return productRepository.findByCategory(category);
+        } else if (subcategory != null) {
+            return productRepository.findBySubcategory(subcategory);
+        } else if (brand != null) {
+            return productRepository.findByBrand(brand);
+        } else if (type != null) {
+            return productRepository.findByType(type);
+        } else {
+            return productRepository.findAll();
+        }
     }
 
-    public List<Product> getProductsBySubCategory(String subCategory) {
-        return productRepository.findBySubcategory(subCategory);
-    }
-
-    public List<Product> getProductsByBrand(String brand) {
-        return productRepository.findByBrand(brand);
-    }
-
-    public List<Product> getProductsByType(String type) {
-        return productRepository.findByType(type);
-    }
-
+  
     
     
 
