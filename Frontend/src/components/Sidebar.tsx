@@ -12,8 +12,19 @@ import {
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import AreaChartDash from "./ui/area-chart";
+import BarChartDash from "./ui/bar-chart";
+import ExCard from "./ui/ClickCards";
+import InAreaChartDash from "./ui/in-area-chart";
+import { PieChartDash } from "./ui/pie-chart";
 import { Links, Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
-
+interface Card {
+  description: string;
+  title: string;
+  ctaText: string;
+  ctaLink: string;
+  content: string | (() => React.ReactNode);
+}
 // Define the structure of each link
 // interface LinkItem {
 //   label: string;
@@ -151,7 +162,7 @@ export const Logo: React.FC = () => {
         animate={{ opacity: 1 }}
         className="font-medium text-black dark:text-white whitespace-pre"
       >
-        Acet Labs
+        StockSync
       </motion.span>
     </Link>
   );
@@ -170,24 +181,96 @@ export const LogoIcon: React.FC = () => {
 
 // Dummy dashboard component with content
 const Dashboard: React.FC = () => {
+  const cards: Card[] = [
+    {
+      description: "Total number of sales in the current month",
+      title: "Sales",
+      ctaText: "View",
+      ctaLink: "https://your-link-here.com/sales",
+      content: () => (
+        <p>
+          The total number of sales this month is a key indicator of the business's performance.
+          It's crucial to monitor this metric to ensure the business is on track to meet its targets.
+          <br />
+          <br />
+          Monitoring sales trends helps in forecasting and planning for future inventory needs,
+          ensuring that popular products are always in stock and slow-moving items are identified.
+        </p>
+      ),
+    },
+    {
+      description: "Current stock levels of all products",
+      title: "Inventory",
+      ctaText: "View",
+      ctaLink: "https://your-link-here.com/inventory",
+      content: () => (
+        <p>
+          Keeping track of current stock levels is essential for inventory management. 
+          It helps in maintaining an optimal stock level, reducing the holding cost, and avoiding stockouts or overstock situations.
+          <br />
+          <br />
+          Regularly updating stock information ensures accurate data is available for making informed decisions.
+        </p>
+      ),
+    },
+    {
+      description: "Number of products that need to be reordered",
+      title: "Reorders",
+      ctaText: "View",
+      ctaLink: "https://your-link-here.com/reorders",
+      content: () => (
+        <p>
+          Identifying products that need to be reordered helps in maintaining continuous availability of products.
+          <br />
+          <br />
+          Timely reordering prevents stockouts and ensures customer satisfaction by meeting demand without delay.
+        </p>
+      ),
+    },
+    {
+      description: "Products that are low in stock",
+      title: "Low Stock",
+      ctaText: "View",
+      ctaLink: "https://your-link-here.com/low-stock",
+      content: () => (
+        <p>
+          Keeping an eye on low stock products is crucial for preventing stockouts and ensuring that popular items are always available for customers.
+          <br />
+          <br />
+          Proactively managing low stock items helps in planning reorders and maintaining optimal stock levels.
+        </p>
+      ),
+    },
+    {
+      description: "Total value of current inventory",
+      title: "Inventory Value",
+      ctaText: "View",
+      ctaLink: "https://your-link-here.com/inventory-value",
+      content: () => (
+        <p>
+          The total value of current inventory provides insights into the capital tied up in stock.
+          <br />
+          <br />
+          It helps in assessing the financial health of the business and making informed purchasing decisions.
+        </p>
+      ),
+    },
+  ];
   return (
     <div className="flex flex-1">
-      <div className="p-2 md:p-10 rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
+      <div className="p-2 md:p-10 overflow-x-hidden hide-scrollbar rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-black flex flex-col gap-10 flex-1 w-full h-full">
         <div className="flex gap-2">
-          {[...new Array(4)].map((_, i) => (
-            <div
-              key={`first-array-${i}`}
-              className="h-20 w-full rounded-lg bg-gray-100 dark:bg-neutral-800 animate-pulse"
-            ></div>
-          ))}
+          <ExCard cards={cards[0]}/>
+          <ExCard cards={cards[1]}/>
+          <ExCard cards={cards[2]}/>
         </div>
-        <div className="flex gap-2 flex-1">
-          {[...new Array(2)].map((_, i) => (
-            <div
-              key={`second-array-${i}`}
-              className="h-full w-full rounded-lg bg-gray-100 dark:bg-neutral-800 animate-pulse"
-            ></div>
-          ))}
+        <div className="flex justify-around">
+          <BarChartDash/>
+          <PieChartDash/>
+          <AreaChartDash/>
+        </div>
+        <div className="w-full">
+          <InAreaChartDash/>
         </div>
       </div>
     </div>
