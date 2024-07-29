@@ -4,17 +4,16 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, MenuItem } from "./ui/navbar-menu";
 
-// Helper function to get the theme from localStorage
 const getInitialTheme = () => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("theme") || "light"; // default to "light" if not set
+    return localStorage.getItem("theme") || "light";
   }
   return "light";
 };
 
-// Helper function to apply the theme class to the body
 const applyTheme = (theme: string) => {
-  document.body.classList.toggle("dark", theme === "dark");
+  document.documentElement.classList.remove("light", "dark");
+  document.documentElement.classList.add(theme);
 };
 
 export function NavbarDemo() {
@@ -29,13 +28,11 @@ function Navbar({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
   const [theme, setTheme] = useState<string>(getInitialTheme);
 
-  // Apply theme when it changes
   useEffect(() => {
     applyTheme(theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Toggle theme function
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
@@ -45,7 +42,14 @@ function Navbar({ className }: { className?: string }) {
       className={cn("fixed top-10 inset-x-0 max-w-2xl mx-auto z-50", className)}
     >
       <Menu setActive={setActive}>
-        <button type="button" onClick={toggleTheme}>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className={cn("icon-btn", {
+            "icon-light": theme === "light",
+            "icon-dark": theme === "dark",
+          })}
+        >
           {theme === "light" ? <IconMoon /> : <IconSun />}
         </button>
         <Link to="/auth/login">
