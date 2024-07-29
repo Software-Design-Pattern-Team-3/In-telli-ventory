@@ -11,25 +11,32 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
+import java.util.Date;
+
+
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+public class Sale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
-    private String productName;
-    private String category;
-    private double price;
-    private double cost;
-    private int stockLevel;
-    private int reorderLevel;
+    private Long saleId;
     
     @ManyToOne
-    @JoinColumn(name = "supplier_id")
-    private Supplier supplier;
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-    // Getters and Setters
+    private int quantity;
+    private Date saleDate;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    
+    private double totalPrice;
+
+    
 }
