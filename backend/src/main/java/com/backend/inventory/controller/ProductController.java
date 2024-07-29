@@ -31,7 +31,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PostMapping
+    @PostMapping("/list")
     public ResponseEntity<List<Product>> addProducts(@RequestBody List<Product> products) {
 
         try {
@@ -42,6 +42,11 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
+    }
+
+    @PostMapping
+    public Product addProduct(@RequestBody Product product) {
+        return productService.addProduct(product);
     }
 
     @GetMapping
@@ -56,19 +61,7 @@ public class ProductController {
     }
     
   
-    @GetMapping("/filter")
-    public ResponseEntity<List<Product>> getProductsByFilter(
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String subcategory,
-            @RequestParam(required = false) String brand,
-            @RequestParam(required = false) String type) {
-        try {
-            List<Product> products = productService.getProductsByFilter(category, subcategory, brand, type);
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+   
 
     
 
