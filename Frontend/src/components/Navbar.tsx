@@ -45,7 +45,14 @@ function Navbar({ className }: { className?: string }) {
       className={cn("fixed top-10 inset-x-0 max-w-2xl mx-auto z-50", className)}
     >
       <Menu setActive={setActive}>
-        <button type="button" onClick={toggleTheme}>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className={cn("icon-btn", {
+            "icon-light": theme === "light",
+            "icon-dark": theme === "dark",
+          })}
+        >
           {theme === "light" ? <IconMoon /> : <IconSun />}
         </button>
         <Link to="/auth/login">
