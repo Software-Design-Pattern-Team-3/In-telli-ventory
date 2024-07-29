@@ -299,13 +299,6 @@ const Admin: React.FC = () => {
 };
 
 
-interface Card {
-  description: string;
-  title: string;
-  ctaText: string;
-  ctaLink: string;
-  content: string | (() => React.ReactNode);
-}
 
 export default function AdminDash() {
   const navigate = useNavigate();
