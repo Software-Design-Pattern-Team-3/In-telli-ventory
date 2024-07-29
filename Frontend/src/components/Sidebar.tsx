@@ -27,36 +27,31 @@ interface Card {
   content: string | (() => React.ReactNode);
 }
 
+const getInitialTheme = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("theme") || "light";
+  }
+  return "light";
+};
+
+const applyTheme = (theme: string) => {
+  document.documentElement.classList.remove("light", "dark");
+  document.documentElement.classList.add(theme);
+};
+
 export default function SidebarDemo() {
   const navigate = useNavigate();
   const { user, logout } = useUser();
-
-  const applyTheme = (theme: string) => {
-    document.documentElement.classList.remove("light", "dark");
-    document.documentElement.classList.add(theme);
-  };
-
-  const [theme, setTheme] = useState(() => {
-    // Get the theme from localStorage or default to 'light'
-    const savedTheme = localStorage.getItem("theme") || "light";
-    // Apply the theme immediately
-    applyTheme(savedTheme);
-    return savedTheme;
-  });
+  const [theme, setTheme] = useState<string>(getInitialTheme);
 
   useEffect(() => {
-    // This effect now only handles saving the theme to localStorage
+    applyTheme(theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggleTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setTheme((prevTheme) => {
-      const newTheme = prevTheme === "light" ? "dark" : "light";
-      // Apply the new theme immediately
-      applyTheme(newTheme);
-      return newTheme;
-    });
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
   const links: Links[] = [
