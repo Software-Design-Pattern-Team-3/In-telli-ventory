@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.inventory.model.Product;
 import com.backend.inventory.service.ProductService;
 
+
 @RestController
 @RequestMapping("/products")
 @CrossOrigin("*")
