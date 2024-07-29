@@ -18,6 +18,7 @@ import ExCard from "./ui/ClickCards";
 import InAreaChartDash from "./ui/in-area-chart";
 import { PieChartDash } from "./ui/pie-chart";
 import { Links, Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
+
 interface Card {
   description: string;
   title: string;
@@ -25,36 +26,35 @@ interface Card {
   ctaLink: string;
   content: string | (() => React.ReactNode);
 }
-// Define the structure of each link
-// interface LinkItem {
-//   label: string;
-//   href?: string; // Optional href for button-like actions
-//   icon: React.JSX.Element | React.ReactNode;
-//   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // Only for button actions
-//   type: 'button' | 'link'; // To distinguish between button and link actions
-// }
 
 export default function SidebarDemo() {
   const navigate = useNavigate();
   const { user, logout } = useUser();
-  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
 
   const applyTheme = (theme: string) => {
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
   };
 
+  const [theme, setTheme] = useState(() => {
+    // Get the theme from localStorage or default to 'light'
+    const savedTheme = localStorage.getItem("theme") || "light";
+    // Apply the theme immediately
+    applyTheme(savedTheme);
+    return savedTheme;
+  });
+
   useEffect(() => {
-    applyTheme(theme);
+    // This effect now only handles saving the theme to localStorage
     localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggleTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); // Prevent default action
+    e.preventDefault();
     setTheme((prevTheme) => {
       const newTheme = prevTheme === "light" ? "dark" : "light";
+      // Apply the new theme immediately
       applyTheme(newTheme);
-      localStorage.setItem("theme", newTheme);
       return newTheme;
     });
   };
@@ -74,7 +74,7 @@ export default function SidebarDemo() {
     },
     {
       label: "Profile",
-      href: "/profile",
+      href: "/admin",
       icon: <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
       type: 'link',
     },
@@ -87,8 +87,8 @@ export default function SidebarDemo() {
     {
       label: "Logout",
       icon: <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
-      onClick: (e:any) => {
-        e.preventDefault(); // Prevent default link behavior
+      onClick: (e: any) => {
+        e.preventDefault();
         logout();
         navigate("/auth/login");
       },
@@ -97,6 +97,7 @@ export default function SidebarDemo() {
   ];
 
   const [open, setOpen] = useState<boolean>(false);
+
   const getAvatar = () => {
     if (user.picture === "none") {
       return (
@@ -137,9 +138,9 @@ export default function SidebarDemo() {
             <SidebarLink
               link={{
                 label: user.name,
-                href: "#", // Ensure href is defined
+                href: "#",
                 icon: getAvatar(),
-                type: 'link', // Since this is a profile link, treat it as a link
+                type: 'link',
               }}
             />
           </div>
@@ -167,6 +168,7 @@ export const Logo = () => {
     </Link>
   );
 };
+
 export const LogoIcon = () => {
   return (
     <Link
@@ -177,7 +179,7 @@ export const LogoIcon = () => {
     </Link>
   );
 };
-// Dummy dashboard component with content
+
 const Dashboard: React.FC = () => {
   const cards: Card[] = [
     {
@@ -226,20 +228,6 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      description: "Products that are low in stock",
-      title: "Low Stock",
-      ctaText: "View",
-      ctaLink: "https://your-link-here.com/low-stock",
-      content: () => (
-        <p>
-          Keeping an eye on low stock products is crucial for preventing stockouts and ensuring that popular items are always available for customers.
-          <br />
-          <br />
-          Proactively managing low stock items helps in planning reorders and maintaining optimal stock levels.
-        </p>
-      ),
-    },
-    {
       description: "Total value of current inventory",
       title: "Inventory Value",
       ctaText: "View",
@@ -249,27 +237,30 @@ const Dashboard: React.FC = () => {
           The total value of current inventory provides insights into the capital tied up in stock.
           <br />
           <br />
-          It helps in assessing the financial health of the business and making informed purchasing decisions.
+          It helps in evaluating the financial health of the business and planning for future investments.
         </p>
       ),
     },
   ];
+
   return (
-    <div className="flex flex-1">
-      <div className="p-2 md:p-10 overflow-x-hidden hide-scrollbar rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-black flex flex-col gap-10 flex-1 w-full h-full">
-        <div className="flex gap-2">
-          <ExCard cards={cards[0]}/>
-          <ExCard cards={cards[1]}/>
-          <ExCard cards={cards[2]}/>
-        </div>
-        <div className="flex justify-around">
-          <BarChartDash/>
-          <PieChartDash/>
-          <AreaChartDash/>
-        </div>
-        <div className="w-full">
-          <InAreaChartDash/>
-        </div>
+    <div className="h-full w-full overflow-auto p-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {cards.map((card, index) => (
+          <ExCard key={index} cards={card} />
+        ))}
+      </div>
+      <div className="grid gap-8 md:grid-cols- lg:grid-cols-3 py-4">
+       
+          <BarChartDash />
+        
+          <AreaChartDash />
+        
+          <PieChartDash />
+        
+      </div>
+      <div className="">
+        <InAreaChartDash />
       </div>
     </div>
   );

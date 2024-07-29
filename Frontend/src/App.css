@@ -65,3 +65,17 @@
 .no-visible-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.icon-light {
+  color: black; /* icon color for light mode */
+}
+
+.icon-dark {
+  color: white; /* icon color for dark mode */
+}
