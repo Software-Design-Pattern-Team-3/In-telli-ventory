@@ -34,7 +34,7 @@ public class ProductService {
         if (!productRepository.existsById(id)) {
             throw new EntityNotFoundException("Product not found with id " + id);
         }
-        product.setId(id);
+        product.setProductId(id);
         return productRepository.save(product);
     }
 
