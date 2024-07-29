@@ -36,15 +36,6 @@ interface Product {
   stock: number;
 }
 
-const fetchData = async (url: string, setData: React.Dispatch<React.SetStateAction<any[]>>) => {
-  try {
-    const response = await axios.get(url);
-    setData(response.data);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 
 interface User {
@@ -59,6 +50,152 @@ interface EditModalProps {
   onClose: () => void;
   onSave: (updatedUser: User) => void;
 }
+interface EditProductModalProps {
+  product: Product | null;
+  onClose: () => void;
+  onSave: (updatedProduct: Product) => void;
+}
+
+export const EditProductModal: React.FC<EditProductModalProps> = ({ product, onClose, onSave }) => {
+  const [editedProduct, setEditedProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (product) {
+      setEditedProduct(product);
+    }
+  }, [product]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (editedProduct) {
+      setEditedProduct(prev => prev ? { ...prev, [name]: value } : prev);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editedProduct) {
+      onSave(editedProduct);
+    }
+  };
+
+  if (!editedProduct) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-6 rounded-xl max-w-4xl w-full">
+        <h2 className="text-xl font-bold mb-4">Edit Product</h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Add all necessary fields for product */}
+          <div className="col-span-1">
+            <label className="block mb-2">Product Name</label>
+            <input
+              type="text"
+              name="productname"
+              value={editedProduct.productname}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Category</label>
+            <input
+              type="text"
+              name="category"
+              value={editedProduct.category}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Subcategory</label>
+            <input
+              type="text"
+              name="subcategory"
+              value={editedProduct.subcategory}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Brand</label>
+            <input
+              type="text"
+              name="brand"
+              value={editedProduct.brand}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Sale Price</label>
+            <input
+              type="number"
+              name="saleprice"
+              value={editedProduct.saleprice}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Market Price</label>
+            <input
+              type="number"
+              name="marketprice"
+              value={editedProduct.marketprice}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Type</label>
+            <input
+              type="text"
+              name="type"
+              value={editedProduct.type}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Rating</label>
+            <input
+              type="number"
+              name="rating"
+              value={editedProduct.rating}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Purchases</label>
+            <input
+              type="number"
+              name="purchases"
+              value={editedProduct.purchases}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Stock</label>
+            <input
+              type="number"
+              name="stock"
+              value={editedProduct.stock}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="flex justify-end col-span-full mt-4">
+            <button type="button" onClick={onClose} className="mr-2 px-4 py-2 bg-gray-200 rounded">Cancel</button>
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const EditModal: React.FC<EditModalProps> = ({ user, onClose, onSave }) => {
   const [editedUser, setEditedUser] = useState<User>({ id: 0, firstname: '', lastname: '', email: '' });
@@ -83,8 +220,8 @@ const EditModal: React.FC<EditModalProps> = ({ user, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg">
-        <h2 className="text-xl font-bold mb-4">Edit User</h2>
+      <div className="bg-white p-6 rounded-xl">
+        <h2 className="text-xl font-bold mb-4">Edit user</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block mb-2">First Name</label>
@@ -93,7 +230,7 @@ const EditModal: React.FC<EditModalProps> = ({ user, onClose, onSave }) => {
               name="firstname"
               value={editedUser.firstname}
               onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
+              className="w-full border rounded-xl px-2 py-1"
             />
           </div>
           <div className="mb-4">
@@ -103,7 +240,7 @@ const EditModal: React.FC<EditModalProps> = ({ user, onClose, onSave }) => {
               name="lastname"
               value={editedUser.lastname}
               onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
+              className="w-full border rounded-xl px-2 py-1"
             />
           </div>
           <div className="mb-4">
@@ -113,7 +250,7 @@ const EditModal: React.FC<EditModalProps> = ({ user, onClose, onSave }) => {
               name="email"
               value={editedUser.email}
               onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
+              className="w-full border rounded-xl px-2 py-1"
             />
           </div>
           <div className="flex justify-end">
@@ -126,7 +263,7 @@ const EditModal: React.FC<EditModalProps> = ({ user, onClose, onSave }) => {
   );
 };
 
-export const UserTable: React.FC = () => {
+const UserTable: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
@@ -169,7 +306,7 @@ export const UserTable: React.FC = () => {
   };
 
   return (
-    <div className="overflow-auto hide-scrollbar h-full">
+    <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]"> {/* Adjusted height */}
       <table className="min-w-full bg-white rounded-lg shadow-md">
         <thead className="bg-gray-200 sticky top-0">
           <tr>
@@ -216,16 +353,52 @@ export const UserTable: React.FC = () => {
   );
 };
 
-const ProductTable: React.FC = () => {
+export const ProductTable: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    fetchData(`${import.meta.env.VITE_REACT_APP_API_URL}/products`, setProducts);
+    fetchProducts();
   }, []);
 
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/products`);
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+  };
+
+  const handleDelete = async (productId: number) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_REACT_APP_API_URL}/products/${productId}`);
+        setProducts(products.filter(product => product.id !== productId));
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
+    }
+  };
+
+  const handleSave = async (updatedProduct: Product) => {
+    try {
+        const response = await axios.put(`${import.meta.env.VITE_REACT_APP_API_URL}/products/${updatedProduct.id}`, updatedProduct);
+        setProducts(products.map(product => product.id === updatedProduct.id ? response.data : product));
+        setEditingProduct(null);
+    } catch (error) {
+        console.error('Error updating product:', error);
+    }
+};
+
+
   return (
-    <div className="overflow-auto hide-scrollbar h-screen">
-      <table className="min-w-full h-screen bg-white rounded-lg shadow-md">
+    <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]"> {/* Adjusted height */}
+      <table className="min-w-full bg-white rounded-lg shadow-md">
         <thead className="bg-gray-200">
           <tr>
             <th className="py-3 px-4 border-b">ID</th>
@@ -239,6 +412,7 @@ const ProductTable: React.FC = () => {
             <th className="py-3 px-4 border-b">Rating</th>
             <th className="py-3 px-4 border-b">Purchases</th>
             <th className="py-3 px-4 border-b">Stock</th>
+            <th className="py-3 px-4 border-b">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -255,13 +429,36 @@ const ProductTable: React.FC = () => {
               <td className="py-3 px-4 border-b">{product.rating}</td>
               <td className="py-3 px-4 border-b">{product.purchases}</td>
               <td className="py-3 px-4 border-b">{product.stock}</td>
+              <td className="py-3 px-4 border-b">
+                <button
+                  onClick={() => handleEdit(product)}
+                  className="mr-2 p-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  <IconEdit size={18} />
+                </button>
+                <button
+                  onClick={() => handleDelete(product.id)}
+                  className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  <IconTrash size={18} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {editingProduct && (
+        <EditProductModal
+          product={editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 };
+
+
 
 const Admin: React.FC = () => {
   const tabs: { title: string; value: string; content: JSX.Element }[] = [
