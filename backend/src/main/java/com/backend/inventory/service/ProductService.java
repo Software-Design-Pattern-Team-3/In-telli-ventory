@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.backend.inventory.model.Product;
 import com.backend.inventory.repository.ProductRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class ProductService {
 
@@ -23,19 +25,17 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-   
-    public List<Product> getProductsByFilter(String category, String subcategory, String brand, String type) {
-        if (category != null) {
-            return productRepository.findByCategory(category);
-        } else if (subcategory != null) {
-            return productRepository.findBySubcategory(subcategory);
-        } else if (brand != null) {
-            return productRepository.findByBrand(brand);
-        } else if (type != null) {
-            return productRepository.findByType(type);
-        } else {
-            return productRepository.findAll();
+
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
+    }
+
+    public Product updateProduct(Long id, Product product) {
+        if (!productRepository.existsById(id)) {
+            throw new EntityNotFoundException("Product not found with id " + id);
         }
+        product.setId(id);
+        return productRepository.save(product);
     }
 
     public Product addProduct(Product product) {
