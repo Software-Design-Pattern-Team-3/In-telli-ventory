@@ -34,6 +34,7 @@ public class PurchaseOrder {
     private Date orderDate;
     private int quantity;
     private String status;
+    private float total_cost;
 
     
 }
