@@ -3,9 +3,11 @@ import { cn } from "@/lib/utils";
 import {
   IconArrowLeft,
   IconBrandTabler,
+  IconEdit,
   IconMoon,
   IconSettings,
   IconSun,
+  IconTrash,
   IconUserBolt,
 } from "@tabler/icons-react";
 import axios from "axios";
@@ -21,29 +23,40 @@ interface User {
   lastname: string;
   email: string;
 }
-
+interface Supplier{
+  supplierId:number;
+  supplierName:string;
+  contactInfo:string;
+  performanceRating:number;
+}
 interface Product {
-  id: number;
-  productname: string;
-  category: string;
-  subcategory: string;
-  brand: string;
-  saleprice: number;
-  marketprice: number;
-  type: string;
-  rating: number;
-  purchases: number;
-  stock: number;
+  productId:number;
+  productName:string;
+  category:string;
+  price:number;
+  cost:number;
+  stockLevel:number;
+  reorderLevel:number;
+  supplier:Supplier;
+}
+interface Review{
+  reviewId:number;
+  product:Product;
+  user:User;
+  reviewText:string;
+  reviewDate: Date;
+  sentimentScore: number;
+}
+interface PO{
+  orderId:number;
+  supplier:Supplier;
+  product:Product;
+  orderDate:Date;
+  quantity: number;
+  status:string;
+  total_cost: number;
 }
 
-import { IconEdit, IconTrash } from '@tabler/icons-react';
-
-interface User {
-  id: number;
-  firstname: string;
-  lastname: string;
-  email: string;
-}
 
 interface EditModalProps {
   user: User | null;
@@ -86,13 +99,12 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({ product, onC
       <div className="bg-white p-6 rounded-xl max-w-4xl w-full">
         <h2 className="text-xl font-bold mb-4">Edit Product</h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Add all necessary fields for product */}
           <div className="col-span-1">
             <label className="block mb-2">Product Name</label>
             <input
               type="text"
-              name="productname"
-              value={editedProduct.productname}
+              name="productName"
+              value={editedProduct.productName}
               onChange={handleChange}
               className="w-full border rounded-xl px-2 py-1"
             />
@@ -108,81 +120,51 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({ product, onC
             />
           </div>
           <div className="col-span-1">
-            <label className="block mb-2">Subcategory</label>
-            <input
-              type="text"
-              name="subcategory"
-              value={editedProduct.subcategory}
-              onChange={handleChange}
-              className="w-full border rounded-xl px-2 py-1"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block mb-2">Brand</label>
-            <input
-              type="text"
-              name="brand"
-              value={editedProduct.brand}
-              onChange={handleChange}
-              className="w-full border rounded-xl px-2 py-1"
-            />
-          </div>
-          <div className="col-span-1">
             <label className="block mb-2">Sale Price</label>
             <input
               type="number"
-              name="saleprice"
-              value={editedProduct.saleprice}
+              name="price"
+              value={editedProduct.price}
               onChange={handleChange}
               className="w-full border rounded-xl px-2 py-1"
             />
           </div>
           <div className="col-span-1">
-            <label className="block mb-2">Market Price</label>
+            <label className="block mb-2">Cost</label>
             <input
               type="number"
-              name="marketprice"
-              value={editedProduct.marketprice}
+              name="cost"
+              value={editedProduct.cost}
               onChange={handleChange}
               className="w-full border rounded-xl px-2 py-1"
             />
           </div>
           <div className="col-span-1">
-            <label className="block mb-2">Type</label>
+            <label className="block mb-2">Stock Level</label>
+            <input
+              type="number"
+              name="stockLevel"
+              value={editedProduct.stockLevel}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Reorder Level</label>
+            <input
+              type="number"
+              name="reorderLevel"
+              value={editedProduct.reorderLevel}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-2 py-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block mb-2">Supplier Name</label>
             <input
               type="text"
-              name="type"
-              value={editedProduct.type}
-              onChange={handleChange}
-              className="w-full border rounded-xl px-2 py-1"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block mb-2">Rating</label>
-            <input
-              type="number"
-              name="rating"
-              value={editedProduct.rating}
-              onChange={handleChange}
-              className="w-full border rounded-xl px-2 py-1"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block mb-2">Purchases</label>
-            <input
-              type="number"
-              name="purchases"
-              value={editedProduct.purchases}
-              onChange={handleChange}
-              className="w-full border rounded-xl px-2 py-1"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block mb-2">Stock</label>
-            <input
-              type="number"
-              name="stock"
-              value={editedProduct.stock}
+              name="supplierName"
+              value={editedProduct.supplier.supplierName}
               onChange={handleChange}
               className="w-full border rounded-xl px-2 py-1"
             />
@@ -378,7 +360,7 @@ export const ProductTable: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await axios.delete(`${import.meta.env.VITE_REACT_APP_API_URL}/products/${productId}`);
-        setProducts(products.filter(product => product.id !== productId));
+        setProducts(products.filter(product => product.productId !== productId));
       } catch (error) {
         console.error('Error deleting product:', error);
       }
@@ -387,48 +369,43 @@ export const ProductTable: React.FC = () => {
 
   const handleSave = async (updatedProduct: Product) => {
     try {
-        const response = await axios.put(`${import.meta.env.VITE_REACT_APP_API_URL}/products/${updatedProduct.id}`, updatedProduct);
-        setProducts(products.map(product => product.id === updatedProduct.id ? response.data : product));
-        setEditingProduct(null);
+      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_API_URL}/products/${updatedProduct.productId}`, updatedProduct);
+      setProducts(products.map(product => product.productId === updatedProduct.productId ? response.data : product));
+      setEditingProduct(null);
     } catch (error) {
-        console.error('Error updating product:', error);
+      console.error('Error updating product:', error);
     }
-};
-
+  };
 
   return (
-    <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]"> {/* Adjusted height */}
+    <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]">
       <table className="min-w-full bg-white rounded-lg shadow-md">
         <thead className="bg-gray-200">
           <tr>
             <th className="py-3 px-4 border-b">ID</th>
             <th className="py-3 px-4 border-b">Product Name</th>
             <th className="py-3 px-4 border-b">Category</th>
-            <th className="py-3 px-4 border-b">Subcategory</th>
-            <th className="py-3 px-4 border-b">Brand</th>
-            <th className="py-3 px-4 border-b">Sale Price</th>
-            <th className="py-3 px-4 border-b">Market Price</th>
-            <th className="py-3 px-4 border-b">Type</th>
-            <th className="py-3 px-4 border-b">Rating</th>
-            <th className="py-3 px-4 border-b">Purchases</th>
-            <th className="py-3 px-4 border-b">Stock</th>
+            <th className="py-3 px-4 border-b">Cost</th>
+            <th className="py-3 px-4 border-b">Price</th>
+            <th className="py-3 px-4 border-b">Stock Level</th>
+            <th className="py-3 px-4 border-b">Reorder Level</th>
+            <th className="py-3 px-4 border-b">Supplier</th>
             <th className="py-3 px-4 border-b">Actions</th>
+            
           </tr>
         </thead>
         <tbody>
           {products.map(product => (
-            <tr key={product.id} className="hover:bg-gray-100">
-              <td className="py-3 px-4 border-b">{product.id}</td>
-              <td className="py-3 px-4 border-b">{product.productname}</td>
+            <tr key={product.productId} className="hover:bg-gray-100">
+              <td className="py-3 px-4 border-b">{product.productId}</td>
+              <td className="py-3 px-4 border-b">{product.productName}</td>
               <td className="py-3 px-4 border-b">{product.category}</td>
-              <td className="py-3 px-4 border-b">{product.subcategory}</td>
-              <td className="py-3 px-4 border-b">{product.brand}</td>
-              <td className="py-3 px-4 border-b">{product.saleprice}</td>
-              <td className="py-3 px-4 border-b">{product.marketprice}</td>
-              <td className="py-3 px-4 border-b">{product.type}</td>
-              <td className="py-3 px-4 border-b">{product.rating}</td>
-              <td className="py-3 px-4 border-b">{product.purchases}</td>
-              <td className="py-3 px-4 border-b">{product.stock}</td>
+              <td className="py-3 px-4 border-b">{product.cost}</td>
+              <td className="py-3 px-4 border-b">{product.price}</td>
+              <td className="py-3 px-4 border-b">{product.stockLevel}</td>
+              <td className="py-3 px-4 border-b">{product.reorderLevel}</td>
+              <td className="py-3 px-4 border-b">{product.supplier.supplierName}</td>
+              
               <td className="py-3 px-4 border-b">
                 <button
                   onClick={() => handleEdit(product)}
@@ -437,7 +414,7 @@ export const ProductTable: React.FC = () => {
                   <IconEdit size={18} />
                 </button>
                 <button
-                  onClick={() => handleDelete(product.id)}
+                  onClick={() => handleDelete(product.productId)}
                   className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   <IconTrash size={18} />
@@ -458,7 +435,188 @@ export const ProductTable: React.FC = () => {
   );
 };
 
-
+interface Sales{
+  saleId:number;
+  quantity:number;
+  saleDate:Date;
+  totalPrice:number;
+  product:Product;
+  user: User;
+}
+export const SalesTable = ()=>{
+    const [sales,setSales] = useState<Sales[]>([]);
+    useEffect(()=>{
+      fetchSales();
+    },[])
+    const fetchSales = async()=>{
+      try{
+      const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/sales`);
+      setSales(response.data);
+      }
+      catch(error){
+        console.error("Error fetching Sales:",error);
+      }
+    };
+    
+    return (
+      <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]"> {/* Adjusted height */}
+      <table className="min-w-full bg-white rounded-lg shadow-md">
+        <thead className="bg-gray-200 sticky top-0">
+          <tr>
+            <th className="py-3 px-4 border-b">ID</th>
+            <th className="py-3 px-4 border-b">Product Name</th>
+            <th className="py-3 px-4 border-b">User Name</th>
+            <th className="py-3 px-4 border-b">Date</th>
+            <th className="py-3 px-4 border-b">Quantity</th>
+            <th className="py-3 px-4 border-b">Total Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sales.map(sale => (
+            <tr key={sale.saleId} className="hover:bg-gray-100">
+              <td className="py-3 px-4 border-b">{sale.saleId}</td>
+              <td className="py-3 px-4 border-b">{sale.product.productName}</td>
+              <td className="py-3 px-4 border-b">{sale.user.firstname}</td>
+              <td className="py-3 px-4 border-b">{new Date(sale.saleDate).toLocaleDateString()}</td>
+              <td className="py-3 px-4 border-b">{sale.quantity}</td>
+              <td className="py-3 px-4 border-b">{sale.totalPrice}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    )
+}
+export const SupplierTable = ()=>{
+    const [suppliers,setSuppliers] = useState<Supplier[]>([]);
+    useEffect(()=>{
+      fetchSuppliers();
+    },[])
+    const fetchSuppliers = async()=>{
+      try{
+      const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/suppliers`);
+      setSuppliers(response.data);
+      }
+      catch(error){
+        console.error("Error fetching Sales:",error);
+      }
+    };
+    
+    return (
+      <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]"> {/* Adjusted height */}
+      <table className="min-w-full bg-white rounded-lg shadow-md">
+        <thead className="bg-gray-200 sticky top-0">
+          <tr>
+            <th className="py-3 px-4 border-b">ID</th>
+            <th className="py-3 px-4 border-b">Supplier Name</th>
+            <th className="py-3 px-4 border-b">Contact info</th>
+            <th className="py-3 px-4 border-b">Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          {suppliers.map(supplier => (
+            <tr key={supplier.supplierId} className="hover:bg-gray-100">
+              <td className="py-3 px-4 border-b">{supplier.supplierId}</td>
+              <td className="py-3 px-4 border-b">{supplier.supplierName}</td>
+              <td className="py-3 px-4 border-b">{supplier.contactInfo}</td>
+              <td className="py-3 px-4 border-b">{supplier.performanceRating}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    )
+}
+export const ReviewTable = ()=>{
+    const [reviews,setReviews] = useState<Review[]>([]);
+    useEffect(()=>{
+      fetchReviews();
+    },[])
+    const fetchReviews = async()=>{
+      try{
+      const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/reviews`);
+      setReviews(response.data);
+      }
+      catch(error){
+        console.error("Error fetching Sales:",error);
+      }
+    };
+    
+    return (
+      <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]"> {/* Adjusted height */}
+      <table className="min-w-full bg-white rounded-lg shadow-md">
+        <thead className="bg-gray-200 sticky top-0">
+          <tr>
+            <th className="py-3 px-4 border-b">ID</th>
+            <th className="py-3 px-4 border-b">Product Name</th>
+            <th className="py-3 px-4 border-b">User Name</th>
+            <th className="py-3 px-4 border-b">Review</th>
+            <th className="py-3 px-4 border-b">Date</th>
+            <th className="py-3 px-4 border-b">Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          {reviews.map(review => (
+            <tr key={review.reviewId} className="hover:bg-gray-100">
+              <td className="py-3 px-4 border-b">{review.reviewId}</td>
+              <td className="py-3 px-4 border-b">{review.product.productName}</td>
+              <td className="py-3 px-4 border-b">{review.user.firstname}</td>
+              <td className="py-3 px-4 border-b">{review.reviewText}</td>
+              <td className="py-3 px-4 border-b">{new Date(review.reviewDate).toLocaleDateString()}</td>
+              <td className="py-3 px-4 border-b">{review.sentimentScore}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    )
+}
+export const POTable = ()=>{
+    const [po,setPo] = useState<PO[]>([]);
+    useEffect(()=>{
+      fetchPO();
+    },[])
+    const fetchPO = async()=>{
+      try{
+      const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/purchase-orders`);
+      setPo(response.data);
+      }
+      catch(error){
+        console.error("Error fetching Sales:",error);
+      }
+    };
+    
+    return (
+      <div className="overflow-auto hide-scrollbar h-[calc(100vh-200px)]"> {/* Adjusted height */}
+      <table className="min-w-full bg-white rounded-lg shadow-md">
+        <thead className="bg-gray-200 sticky top-0">
+          <tr>
+            <th className="py-3 px-4 border-b">ID</th>
+            <th className="py-3 px-4 border-b">Supplier Name</th>
+            <th className="py-3 px-4 border-b">Product Name</th>
+            <th className="py-3 px-4 border-b">Date</th>
+            <th className="py-3 px-4 border-b">Status</th>
+            <th className="py-3 px-4 border-b">Quantity</th>
+            <th className="py-3 px-4 border-b">Total Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          {po.map(pos => (
+            <tr key={pos.orderId} className="hover:bg-gray-100">
+              <td className="py-3 px-4 border-b">{pos.orderId}</td>
+              <td className="py-3 px-4 border-b">{pos.supplier.supplierName}</td>
+              <td className="py-3 px-4 border-b">{pos.product.productName}</td>
+              <td className="py-3 px-4 border-b">{new Date(pos.orderDate).toLocaleDateString()}</td>
+              <td className="py-3 px-4 border-b">{pos.status}</td>
+              <td className="py-3 px-4 border-b">{pos.quantity}</td>
+              <td className="py-3 px-4 border-b">{pos.total_cost}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    )
+}
 
 const Admin: React.FC = () => {
   const tabs: { title: string; value: string; content: JSX.Element }[] = [
@@ -482,6 +640,54 @@ const Admin: React.FC = () => {
           <p className="mb-4 font-semibold text-gray-700">Products</p>
           <div className="flex-grow overflow-hidden">
             <ProductTable />
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Sales",
+      value: "sales",
+      content: (
+        <div className="w-full h-full rounded-2xl p-6 text-lg text-black bg-white shadow-md flex flex-col">
+          <p className="mb-4 font-semibold text-gray-700">Sales</p>
+          <div className="flex-grow overflow-hidden">
+            <SalesTable />
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Suppliers",
+      value: "suppliers",
+      content: (
+        <div className="w-full h-full rounded-2xl p-6 text-lg text-black bg-white shadow-md flex flex-col">
+          <p className="mb-4 font-semibold text-gray-700">Suppliers</p>
+          <div className="flex-grow overflow-hidden">
+            <SupplierTable />
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Reviews",
+      value: "reviews",
+      content: (
+        <div className="w-full h-full rounded-2xl p-6 text-lg text-black bg-white shadow-md flex flex-col">
+          <p className="mb-4 font-semibold text-gray-700">Reviews</p>
+          <div className="flex-grow overflow-hidden">
+            <ReviewTable />
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Purchase Order",
+      value: "purchase order",
+      content: (
+        <div className="w-full h-full rounded-2xl p-6 text-lg text-black bg-white shadow-md flex flex-col">
+          <p className="mb-4 font-semibold text-gray-700">Purchase Order</p>
+          <div className="flex-grow overflow-hidden">
+            <POTable />
           </div>
         </div>
       ),
