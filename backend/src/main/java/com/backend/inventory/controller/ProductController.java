@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.inventory.model.Product;
 import com.backend.inventory.service.ProductService;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -46,6 +48,19 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable Long id) {
+        try {
+            Product pro = productService.getProduct(id);
+            return new ResponseEntity<>(pro, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    
+    
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteProduct(@PathVariable Long id) {
