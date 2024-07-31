@@ -33,6 +33,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@gradio/client": "^1.4.0",
     "@types/jwt-decode": "^2.2.1",
     "@types/node": "^20.14.12",
     "@types/react": "^18.3.3",
