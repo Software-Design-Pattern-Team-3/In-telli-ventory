@@ -38,8 +38,17 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product addProduct(Product product) {
-        return productRepository.save(product);
+    
+
+    public Product getProduct(Long id) {
+        
+        if(productRepository.existsById(id))
+        {
+            return productRepository.findById(id).orElse(null);
+           
+        }
+
+        return null;
     }
 
   
