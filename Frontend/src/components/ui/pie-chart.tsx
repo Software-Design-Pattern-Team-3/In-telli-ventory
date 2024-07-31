@@ -42,7 +42,7 @@ export function PieChartDash() {
             const result = await client.predict("/sentiment_analysis", {});
 
 
-            const data: SentimentAnalysisResult = result.data[0] as SentimentAnalysisResult;
+            const data = (result.data as unknown[])[0] as SentimentAnalysisResult;
 
             const processedData = [
                 { name: "Positive", value: data.positive_percentage, fill: "hsl(var(--chart-1))" },
