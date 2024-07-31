@@ -35,6 +35,7 @@ export function PieChartDash() {
     const [chartData, setChartData] = useState<{ name: string; value: number; fill: string }[]>([]);
     const [totalVisitors, setTotalVisitors] = useState(0);
     const [pred,setPred] = useState(0);
+    const [pieload, setPieload] = useState(true);
     useEffect(() => {
         const fetchSenti = async () => {
 
@@ -52,6 +53,7 @@ export function PieChartDash() {
             setChartData(processedData);
             setTotalVisitors(data.total_reviews);
             setPred((data.positive_percentage * 10/100))
+            setPieload(false)
         };
 
         fetchSenti();
@@ -77,7 +79,9 @@ export function PieChartDash() {
                 <CardTitle>Sentiment Analysis</CardTitle>
                 <CardDescription>July - November 2024</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
+            {!pieload ? (
+                <>
+                <CardContent className="flex-1 pb-0">
                 <ChartContainer
                     config={chartConfig}
                     className="mx-auto aspect-square max-h-[250px]"
@@ -136,6 +140,12 @@ export function PieChartDash() {
                     Analysis of users sentiments after using your products
                 </div>
             </CardFooter>
+            </>
+            ):
+            (
+                <div className="h-full w-full -mt-10 flex justify-center items-center">Our AI is working out the sentiments...</div>
+            )}
+            
         </Card>
     );
 }
