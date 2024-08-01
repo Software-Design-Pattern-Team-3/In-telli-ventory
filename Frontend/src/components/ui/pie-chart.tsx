@@ -86,7 +86,7 @@ const [sentiRev,setSentiRev] = React.useState(0)
           <CardDescription>Analysis of <span className="font-bold">{totalVisitors}</span> Reviews</CardDescription>
         </div>
         {!pieload ?(<Select value={activeSentiment} onValueChange={setActiveSentiment}>
-          <SelectTrigger className="ml-auto h-7 w-[130px] rounded-xl pl-2.5" aria-label="Select a sentiment">
+          <SelectTrigger className="ml-auto w-[160px] rounded-xl pl-2.5" aria-label="Select a sentiment">
             <SelectValue placeholder="Select sentiment" />
           </SelectTrigger>
           <SelectContent align="end" className="rounded-xl">
