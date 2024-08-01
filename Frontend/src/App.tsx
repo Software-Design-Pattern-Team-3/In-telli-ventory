@@ -1,5 +1,3 @@
-
-
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Dash from './components/Dashboard'
@@ -9,6 +7,7 @@ import { Register } from './components/Register'
 import Admin from './components/Tables'
 function App() {
   
+
   return (
     <>
     
