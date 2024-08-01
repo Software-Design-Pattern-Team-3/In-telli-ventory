@@ -46,8 +46,8 @@ export function  PieChartDash() {
 const [sentiRev,setSentiRev] = React.useState(0)
   React.useEffect(() => {
     const fetchSenti = async () => {
-      const client = await Client.connect("YashwanthSC/Sentina")
-      const result = await client.predict("/sentiment_analysis", {})
+        const client = await Client.connect("YashwanthSC/Sentina");
+        const result = await client.predict("/lambda", { });
       const data = (result.data as unknown[])[0] as SentimentAnalysisResult
 
       const processedData = [
