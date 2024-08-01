@@ -55,11 +55,11 @@ export default function InAreaChartDash() {
         const client = await Client.connect("YashwanthSC/Demanda");
         const result = await client.predict("/predict", { days: parseInt(timeRange, 10) });
 
-        // Directly use the fetched data
-        const dataArray = Array.isArray(result.data[0]) ? result.data[0] : Object.values(result.data[0]);
+        // Handle the result type safely
+        const data = result.data as any;
+        const dataArray: DemandForecastResult[] = Array.isArray(data[0]) ? data[0] : Object.values(data[0]);
 
         setChartData(dataArray);
-        console.log("dataArray", dataArray[0]); 
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -134,12 +134,11 @@ export default function InAreaChartDash() {
                 dataKey="product_name"
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 10,
-                  angle: -45,  // Rotate labels
-                  textAnchor: 'end',  // Align text to end of the tick line
-                  dy: 10,  // Adjust vertical position
-                }}
+                tick={{ fontSize: 10 }}
                 interval={0}
+                angle={-45}  // Rotate labels
+                textAnchor="end"  // Align text to end of the tick line
+                dy={10}  // Adjust vertical position
               />
               <ChartTooltip
                 cursor={false}
