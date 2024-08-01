@@ -1,4 +1,0 @@
-gradio==3.35.2
-requests==2.31.0
-transformers==4.30.2
-torch==2.0.1
