@@ -13,12 +13,14 @@ public class SaleService {
 
     @Autowired
     private SaleRepository saleRepository;
+    
 
     public List<Sale> getAllSales() {
         return saleRepository.findAll();
     }
 
     public Sale addSale(Sale sale) {
+
         return saleRepository.save(sale);
     }
 
