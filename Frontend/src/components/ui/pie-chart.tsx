@@ -1,27 +1,15 @@
-// PieChartDash.tsx
-import { Client } from "@gradio/client";
-import { TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Label, Pie, PieChart } from "recharts";
-
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChartConfig, ChartContainer, ChartStyle, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Client } from "@gradio/client"
+import * as React from "react"
+import { Label, Pie, PieChart, Sector } from "recharts"
+import { PieSectorDataItem } from "recharts/types/polar/Pie"
 
 interface SentimentAnalysisResult {
-  total_reviews:number;
+  total_reviews: number;
   negative_percentage: number;
+  neutral_percentage: number;
   positive_percentage: number;
   products_by_category: ProductsByCategory;
 }
@@ -31,121 +19,141 @@ interface ProductsByCategory {
   positive: string[];
 }
 
-export function PieChartDash() {
-    const [chartData, setChartData] = useState<{ name: string; value: number; fill: string }[]>([]);
-    const [totalVisitors, setTotalVisitors] = useState(0);
-    const [pred,setPred] = useState(0);
-    const [pieload, setPieload] = useState(true);
-    useEffect(() => {
-        const fetchSenti = async () => {
+const chartConfig = {
+  sentiment: {
+    label: "Sentiment",
+  },
+  Positive: {
+    label: "Positive",
+    color: "hsl(var(--chart-1))",
+  },
+  Neutral: {
+    label: "Neutral",
+    color: "hsl(var(--chart-3))",
+  },
+  Negative: {
+    label: "Negative",
+    color: "hsl(var(--chart-5))",
+  },
+} satisfies ChartConfig
 
-            const client = await Client.connect("YashwanthSC/Sentina");
-            const result = await client.predict("/sentiment_analysis", {});
+export function  PieChartDash() {
+  const id = "pie-interactive"
+  const [chartData, setChartData] = React.useState<{ name: string; value: number; fill: string }[]>([])
+  const [totalVisitors, setTotalVisitors] = React.useState(0)
+  const [activeSentiment, setActiveSentiment] = React.useState("Positive")
+  const [pieload, setPieload] = React.useState(true)
+const [sentiRev,setSentiRev] = React.useState(0)
+  React.useEffect(() => {
+    const fetchSenti = async () => {
+      const client = await Client.connect("YashwanthSC/Sentina")
+      const result = await client.predict("/sentiment_analysis", {})
+      const data = (result.data as unknown[])[0] as SentimentAnalysisResult
 
+      const processedData = [
+        { name: "Positive", value: data.positive_percentage, fill: "hsl(var(--chart-1))" },
+        { name: "Neutral", value: data.neutral_percentage, fill: "hsl(var(--chart-3))" },
+        { name: "Negative", value: data.negative_percentage, fill: "hsl(var(--chart-5))" },
+      ]
 
-            const data = (result.data as unknown[])[0] as SentimentAnalysisResult;
+      setChartData(processedData)
+      setTotalVisitors(data.total_reviews)
+      setPieload(false)
+    }
 
-            const processedData = [
-                { name: "Positive", value: data.positive_percentage, fill: "hsl(var(--chart-1))" },
-                { name: "Negative", value: data.negative_percentage, fill: "hsl(var(--chart-5))" },
-            ];
+    fetchSenti()
+  }, [])
 
-            setChartData(processedData);
-            setTotalVisitors(data.total_reviews);
-            setPred((data.positive_percentage * 10/100))
-            setPieload(false)
-        };
+  React.useEffect(() => {
+    const sentimentIndex = chartData.findIndex((item) => item.name === activeSentiment)
+    if (sentimentIndex !== -1) {
+      setSentiRev(Math.round((totalVisitors * chartData[sentimentIndex].value) / 100))
+    }
+  }, [activeSentiment, chartData, totalVisitors])
 
-        fetchSenti();
-    }, []);
+  const activeIndex = React.useMemo(
+    () => chartData.findIndex((item) => item.name === activeSentiment),
+    [activeSentiment, chartData]
+  )
+  const sentiments = React.useMemo(() => chartData.map((item) => item.name), [chartData])
 
-    const chartConfig: ChartConfig = {
-        visitors: {
-            label: "Visitors",
-        },
-        Positive: {
-            label: "Positive",
-            color: "hsl(var(--chart-1))",
-        },
-        Negative: {
-            label: "Negative",
-            color: "hsl(var(--chart-5))",
-        },
-    };
+  return (
+    <Card data-chart={id} className="flex flex-col">
+      <ChartStyle id={id} config={chartConfig} />
+      <CardHeader className="flex-row items-start space-y-0 pb-0">
+        <div className="grid gap-1">
+          <CardTitle>Sentiment Analysis</CardTitle>
+          <CardDescription>Analysis of <span className="font-bold">{totalVisitors}</span> Reviews</CardDescription>
+        </div>
+        {!pieload ?(<Select value={activeSentiment} onValueChange={setActiveSentiment}>
+          <SelectTrigger className="ml-auto h-7 w-[130px] rounded-xl pl-2.5" aria-label="Select a sentiment">
+            <SelectValue placeholder="Select sentiment" />
+          </SelectTrigger>
+          <SelectContent align="end" className="rounded-xl">
+            {sentiments.map((key) => {
+              const config = chartConfig[key as keyof typeof chartConfig]
 
-    return (
-        <Card className="flex flex-col">
-            <CardHeader className="items-center pb-0">
-                <CardTitle>Sentiment Analysis</CardTitle>
-                <CardDescription>July - November 2024</CardDescription>
-            </CardHeader>
-            {!pieload ? (
-                <>
-                <CardContent className="flex-1 pb-0">
-                <ChartContainer
-                    config={chartConfig}
-                    className="mx-auto aspect-square max-h-[250px]"
-                >
-                    <PieChart>
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
-                        />
-                        <Pie
-                            data={chartData}
-                            dataKey="value"
-                            nameKey="name"
-                            innerRadius={60}
-                            strokeWidth={5}
-                        >
-                            <Label
-                                content={({ viewBox }) => {
-                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                        return (
-                                            <text
-                                                x={viewBox.cx}
-                                                y={viewBox.cy}
-                                                textAnchor="middle"
-                                                dominantBaseline="middle"
-                                            >
-                                                <tspan
-                                                    x={viewBox.cx}
-                                                    y={viewBox.cy}
-                                                    className="fill-foreground text-3xl font-bold"
-                                                >
-                                                    {totalVisitors.toLocaleString()}
-                                                </tspan>
-                                                <tspan
-                                                    x={viewBox.cx}
-                                                    y={(viewBox.cy || 0) + 24}
-                                                    className="fill-muted-foreground"
-                                                >
-                                                    Reviews
-                                                </tspan>
-                                            </text>
-                                        );
-                                    }
-                                    return null;
-                                }}
-                            />
-                        </Pie>
-                    </PieChart>
-                </ChartContainer>
-            </CardContent>
-            <CardFooter className="flex-col gap-2 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none">
-                    About {pred} of 10 people love your product <TrendingUp className="h-4 w-4" />
-                </div>
-                <div className="leading-none text-muted-foreground">
-                    Analysis of users sentiments after using your products
-                </div>
-            </CardFooter>
-            </>
-            ):
-            (
-                <div className="h-full w-full -mt-10 flex justify-center items-center">Our AI is working out the sentiments...</div>
-            )}
-            
-        </Card>
-    );
+              if (!config) {
+                return null
+              }
+
+              return (
+                <SelectItem key={key} value={key} className="rounded-lg [&_span]:flex">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="flex h-3 w-3 shrink-0 rounded-sm" style={{ backgroundColor: `var(--color-${key})` }} />
+                    {config?.label}
+                  </div>
+                </SelectItem>
+              )
+            })}
+          </SelectContent>
+        </Select>):(
+            <div></div>
+        )}
+        
+      </CardHeader>
+      <CardContent className="flex flex-1 justify-center pb-0">
+        <ChartContainer id={id} config={chartConfig} className="mx-auto aspect-square w-full max-w-[300px]">
+          {!pieload ? (
+            <PieChart>
+              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={60}
+                strokeWidth={5}
+                activeIndex={activeIndex}
+                activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
+                  <g>
+                    <Sector {...props} outerRadius={outerRadius + 10} />
+                    <Sector {...props} outerRadius={outerRadius + 25} innerRadius={outerRadius + 12} />
+                  </g>
+                )}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                          <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
+                            {sentiRev.toLocaleString()}
+                          </tspan>
+                          <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
+                            Reviews
+                          </tspan>
+                        </text>
+                      )
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          ) : (
+            <div className="h-full w-full flex justify-center items-center">Our AI is working out the sentiments...</div>
+          )}
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  )
 }
