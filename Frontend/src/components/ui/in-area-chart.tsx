@@ -81,7 +81,7 @@ export default function InAreaChartDash() {
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
-            className="w-[160px] rounded-lg sm:ml-auto"
+            className="w-[160px] rounded-xl sm:ml-auto"
             aria-label="Select a value"
           >
             <SelectValue placeholder="Next 30 days" />
