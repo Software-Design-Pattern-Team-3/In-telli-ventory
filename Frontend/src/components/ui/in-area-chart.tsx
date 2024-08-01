@@ -120,14 +120,18 @@ export default function InAreaChartDash() {
           >
             <AreaChart data={chartData} margin={{ right: 30, bottom: 50, left: 30 }}>
               <defs>
-                <linearGradient id="fillMinimum" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="fillMaximum" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#B0B0B0" stopOpacity={0.8} /> {/* Grey color */}
                   <stop offset="95%" stopColor="#B0B0B0" stopOpacity={0.1} />
                 </linearGradient>
-                <linearGradient id="fillMaximum" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="fillMinimum" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#FFFFFF" stopOpacity={0.8} /> {/* White color */}
                   <stop offset="95%" stopColor="#FFFFFF" stopOpacity={0.1} />
                 </linearGradient>
+                <linearGradient id="fillPredicted" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="5%" stopColor="#FFA500" stopOpacity={0.8} /> {/* Orange color */}
+    <stop offset="95%" stopColor="#FFA500" stopOpacity={0.1} /> {/* Faded Orange */}
+  </linearGradient>
               </defs>
               <CartesianGrid vertical={false} />
               <XAxis
@@ -150,16 +154,28 @@ export default function InAreaChartDash() {
                 }
               />
               <Area
+                            name="Maximum Demand"
+
                 dataKey="maximum_demand"
                 type="natural"
-                fill="url(#fillMinimum)"
-                stroke="#B0B0B0" 
+                fill="url(#fillMaximum)"
+                stroke= "#B0B0B0"
                 stackId="a"
               />
               <Area
+                            name="Predicted Demand"
+
+                dataKey="predicted_quantity"
+                type="natural"
+                fill="url(#fillPredicted)"
+                stroke="orange"  // Blue color for stroke
+                stackId="a"
+              />
+              <Area 
+              name="Minimum Demand"
                 dataKey="minimum_demand"
                 type="natural"
-                fill="url(#fillMaximum)"
+                fill="url(#fillMinimum)"
                 stroke="#FFFFFF"
                 stackId="a"
               />
