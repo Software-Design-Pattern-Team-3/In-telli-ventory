@@ -123,7 +123,7 @@ export default function ExCard({ cards }: ExpandableCardDemoProps) {
               <div>
                 <motion.h3
                   layoutId={`title-${cards.title}-${id}`}
-                  className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
+                  className=" text-2xl font-bold text-neutral-800 dark:text-neutral-200 text-center md:text-left"
                 >
                   {cards.title}
                 </motion.h3>

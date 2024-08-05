@@ -209,7 +209,7 @@ const Dashboard: React.FC = () => {
   })
   const cards: Card[] = [
     {
-      description: "Total number of sales in the current month",
+      description: "Total number of sales",
       title: saleCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/sales",
@@ -225,7 +225,7 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      description: "Current stock levels of all products",
+      description: "Current count of all products",
       title: productCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/inventory",
@@ -240,7 +240,7 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      description: "Number of products that need to be reordered",
+      description: "Number of products reordered",
       title: poCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/reorders",
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      description: "Total value of current inventory",
+      description: "Total number of suppliers",
       title: supplierCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/inventory-value",
