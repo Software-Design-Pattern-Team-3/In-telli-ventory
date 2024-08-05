@@ -22,6 +22,7 @@ import com.backend.inventory.service.ProductService;
 import com.backend.inventory.service.SaleService;
 import com.backend.inventory.service.UserService;
 
+
 @RestController
 @RequestMapping("/api/sales")
 @CrossOrigin("*")
@@ -73,6 +74,11 @@ public ResponseEntity<Sale> createSale(@RequestBody Map<String, Object> saleData
         e.printStackTrace();
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
+@GetMapping("/count")
+public long getCount() {
+    long count = saleService.getCount();
+    return count;
 }
 
 

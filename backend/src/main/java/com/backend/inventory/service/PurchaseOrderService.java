@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backend.inventory.repository.PurchaseOrderRepository;
 import com.backend.inventory.model.PurchaseOrder;
+import com.backend.inventory.repository.PurchaseOrderRepository;
 
 @Service
 public class PurchaseOrderService {
@@ -20,5 +20,9 @@ public class PurchaseOrderService {
 
     public PurchaseOrder addPurchaseOrder(PurchaseOrder purchaseOrder) {
         return purchaseOrderRepository.save(purchaseOrder);
+    }
+
+    public long getCount() {
+        return purchaseOrderRepository.count();
     }
 }
