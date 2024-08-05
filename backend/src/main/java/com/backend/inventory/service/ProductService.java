@@ -51,6 +51,10 @@ public class ProductService {
         return null;
     }
 
+    public long getCount() {
+        return productRepository.count();
+    }
+
   
     
     

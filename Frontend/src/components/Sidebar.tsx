@@ -9,6 +9,7 @@ import {
   IconSun,
   IconUserBolt,
 } from "@tabler/icons-react";
+import axios from "axios";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -176,10 +177,40 @@ export const LogoIcon = () => {
 };
 
 const Dashboard: React.FC = () => {
+  const [saleCount,setSaleCount] = useState(0)
+  const [productCount,setProductCount]  =useState(0)
+  const [poCount,setPOCount] = useState(0)
+  const [supplierCount,setSupplierCount] = useState(0)
+  useEffect(()=>{
+    const fetchSalesCount = async() =>{
+      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/sales/count`)
+      setSaleCount(count.data)
+    }
+
+    fetchSalesCount()
+    const fetchProductCount = async() =>{
+      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/products/count`)
+      setProductCount(count.data)
+    }
+
+    fetchProductCount()
+    const fetchPOCount = async() =>{
+      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/purchase-orders/count`)
+      setPOCount(count.data)
+    }
+
+    fetchPOCount()
+    const fetchSupplierCount = async() =>{
+      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/suppliers/count`)
+      setSupplierCount(count.data)
+    }
+
+    fetchSupplierCount()
+  })
   const cards: Card[] = [
     {
       description: "Total number of sales in the current month",
-      title: "Sales",
+      title: saleCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/sales",
       content: () => (
@@ -195,7 +226,7 @@ const Dashboard: React.FC = () => {
     },
     {
       description: "Current stock levels of all products",
-      title: "Inventory",
+      title: productCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/inventory",
       content: () => (
@@ -210,7 +241,7 @@ const Dashboard: React.FC = () => {
     },
     {
       description: "Number of products that need to be reordered",
-      title: "Reorders",
+      title: poCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/reorders",
       content: () => (
@@ -224,7 +255,7 @@ const Dashboard: React.FC = () => {
     },
     {
       description: "Total value of current inventory",
-      title: "Inventory Value",
+      title: supplierCount.toString(),
       ctaText: "View",
       ctaLink: "https://your-link-here.com/inventory-value",
       content: () => (

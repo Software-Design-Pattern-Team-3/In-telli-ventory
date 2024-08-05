@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.inventory.model.Product;
 import com.backend.inventory.service.ProductService;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -81,4 +80,10 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/count")
+    public long getProductCount() {
+        long count = productService.getCount();
+        return count;
+    }
+    
 }

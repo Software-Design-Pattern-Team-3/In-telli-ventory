@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.inventory.service.SupplierService;
 import com.backend.inventory.model.Supplier;
+import com.backend.inventory.service.SupplierService;
 
 @RestController
 @RequestMapping("/api/suppliers")
@@ -29,5 +29,10 @@ public class SupplierController {
     @PostMapping
     public Supplier addSupplier(@RequestBody Supplier supplier) {
         return supplierService.addSupplier(supplier);
+    }
+
+    @GetMapping("/count")
+    public long getSupplierCount(){
+        return supplierService.getCount();
     }
 }

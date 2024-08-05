@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.inventory.service.PurchaseOrderService;
 import com.backend.inventory.model.PurchaseOrder;
+import com.backend.inventory.service.PurchaseOrderService;
 
 @RestController
 @RequestMapping("/api/purchase-orders")
@@ -29,5 +29,9 @@ public class PurchaseOrderController {
     @PostMapping
     public PurchaseOrder addPurchaseOrder(@RequestBody PurchaseOrder purchaseOrder) {
         return purchaseOrderService.addPurchaseOrder(purchaseOrder);
+    }
+    @GetMapping("/count")
+    public long getPOCount(){
+        return purchaseOrderService.getCount();
     }
 }
