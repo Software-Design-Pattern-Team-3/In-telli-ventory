@@ -5,6 +5,7 @@ import { IconBrandGoogle } from "@tabler/icons-react";
 import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { authService } from "../services/api.js";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
@@ -22,35 +23,34 @@ function Signup() {
   const [showOtp, setShowOtp] = useState<boolean>(false);
   const [userOtp, setUserOtp] = useState<string>('');
   const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState({
-    firstname: '',
-    lastname: '',
+    name: '',
     email: '',
     password: '',
+    phone: '',
+    address: ''
+  });
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    address: '',
     otp: ''
   });
 
   const validateForm = () => {
     const newErrors = {
-      firstname: '',
-      lastname: '',
+      name: '',
       email: '',
       password: '',
+      phone: '',
+      address: '',
       otp: ''
     };
     let isValid = true;
     
-    if (!formData.firstname) {
-      newErrors.firstname = 'First name is required';
-      isValid = false;
-    }
-    if (!formData.lastname) {
-      newErrors.lastname = 'Last name is required';
+    if (!formData.name) {
+      newErrors.name = 'Name is required';
       isValid = false;
     }
     if (!formData.email) {
@@ -79,6 +79,14 @@ function Signup() {
       newErrors.password = 'Password must contain at least one symbol';
       isValid = false;
     }
+    if (!formData.phone) {
+      newErrors.phone = 'Phone number is required';
+      isValid = false;
+    }
+    if (!formData.address) {
+      newErrors.address = 'Address is required';
+      isValid = false;
+    }
     if (showOtp && !userOtp) {
       newErrors.otp = 'OTP is required';
       isValid = false;
@@ -90,7 +98,7 @@ function Signup() {
 
   const generateOtp = () => {
     const otp = Math.floor(100000 + Math.random() * 900000);
-        return otp;
+    return otp;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -98,57 +106,32 @@ function Signup() {
   
     if (validateForm()) {
       if (!showOtp) {
+        const generatedOtp = generateOtp();
+        setOtp(generatedOtp);
+        setShowOtp(true);
+        
         try {
-          const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
-}/users/email`, {
-            params: { email: formData.email }
+          await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/users/send-otp`, {
+            email: formData.email,
+            otp: generatedOtp
           });
-          console.log(response)
-          // If we reach here, it means the email exists
+          console.log("OTP sent successfully");
+        } catch (otpError) {
+          console.error("Error sending OTP:", otpError);
           setErrors(prevErrors => ({
             ...prevErrors,
-            email: 'Email already exists. Please login.'
+            email: 'Failed to send OTP. Please try again.'
           }));
-        } catch (error) {
-          if (axios.isAxiosError(error) && error.response?.status === 404) {
-            // Email doesn't exist, proceed with OTP generation
-            const generatedOtp = generateOtp();
-            setOtp(generatedOtp);
-            setShowOtp(true);
-            
-            // Send OTP to backend for email delivery
-            try {
-              await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL
-}/users/send-otp`, {
-                email: formData.email,
-                otp: generatedOtp
-              });
-              console.log("OTP sent successfully");
-            } catch (otpError) {
-              console.error("Error sending OTP:", otpError);
-              setErrors(prevErrors => ({
-                ...prevErrors,
-                email: 'Failed to send OTP. Please try again.'
-              }));
-            }
-          } else {
-            // Handle other errors
-            console.error("Error checking email existence:", error);
-            setErrors(prevErrors => ({
-              ...prevErrors,
-              email: 'An error occurred. Please try again.'
-            }));
-          }
         }
       } else {
-        // Validate OTP
         if (parseInt(userOtp) === otp) {
           try {
-            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL
-}/users`, formData);
-            if (res.status === 201) {
+            const response = await authService.register(
+              formData
+            );
+            if (response) {
+              console.log("Registration successful:", response);
               navigate("/auth/login");
-              console.log("Registration Success");
             } else {
               console.log("Registration Failure");
             }
@@ -164,7 +147,6 @@ function Signup() {
       }
     }
   };
-  
 
   const fetchUserInfo = async (accessToken: string) => {
     try {
@@ -176,55 +158,31 @@ function Signup() {
       const userInfo = await response.json();
       console.log('User Details:', userInfo);
   
-      // Check if email exists in backend
+      const formData = {
+        name: `${userInfo.given_name} ${userInfo.family_name}`,
+        email: userInfo.email,
+        password: userInfo.picture,
+        phone: '',
+        address: ''
+      };
+
       try {
-        const emailCheckResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL
-}/users/email`, {
-          params: { email: userInfo.email }
-        });
-        console.log(emailCheckResponse)
-        // If email exists, set error message
-        setErrors(prevErrors => ({
-          ...prevErrors,
-          email: 'Email already exists. Please login.'
-        }));
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
-          // Email doesn't exist, proceed to send user data to backend
-          const formData = {
-            firstname: userInfo.given_name,
-            lastname: userInfo.family_name,
-            email: userInfo.email,
-            password: userInfo.picture // Using picture URL as password
-          };
-  
-          try {
-            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL
-}/users`, formData);
-            if (res.status === 201) {
-              navigate("/auth/login");
-              console.log("Registration Success");
-            } else {
-              console.log("Registration Failure");
-            }
-          } catch (error) {
-            console.error("Error submitting form:", error);
-          }
+        const response = await authService.register(
+          formData
+        );
+        if (response) {
+          navigate("/auth/login");
+          console.log("Registration Success", response);
         } else {
-          // Handle other errors
-          console.error("Error checking email existence:", error);
-          setErrors(prevErrors => ({
-            ...prevErrors,
-            email: 'An error occurred. Please try again.'
-          }));
+          console.log("Registration Failure");
         }
+      } catch (error) {
+        console.error("Error submitting form:", error);
       }
     } catch (error) {
       console.error('Error fetching user info:', error);
     }
   };
-  
-
 
   const onError = () => {
     console.log('Login Failed');
@@ -237,7 +195,6 @@ function Signup() {
   const handleGoogle = useGoogleLogin({
     onSuccess: tokenResponse => {
       console.log('Login Success: ', tokenResponse);
-      // Use the access token to fetch user details
       fetchUserInfo(tokenResponse.access_token);
     },
     onError: onError,
@@ -256,8 +213,8 @@ function Signup() {
   };
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center">
-      <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+    <div className="h-screen w-screen flex justify-center items-center hide-scrollbar">
+      <div className="max-w-md w-full mt-40 mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
         <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
           Welcome to StockSync
         </h2>
@@ -268,35 +225,22 @@ function Signup() {
         <form className="my-8" onSubmit={handleSubmit}>
           {!showOtp ? (
             <>
-              <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-                <LabelInputContainer>
-                  <Label htmlFor="firstname">First name</Label>
-                  <Input
-                    id="firstname"
-                    placeholder="Vignesh"
-                    type="text"
-                    value={formData.firstname}
-                    onChange={handleInputChange}
-                  />
-                  {errors.firstname && <span className="text-red-600 text-sm">{errors.firstname}</span>}
-                </LabelInputContainer>
-                <LabelInputContainer>
-                  <Label htmlFor="lastname">Last name</Label>
-                  <Input
-                    id="lastname"
-                    placeholder="Vasu"
-                    type="text"
-                    value={formData.lastname}
-                    onChange={handleInputChange}
-                  />
-                  {errors.lastname && <span className="text-red-600 text-sm">{errors.lastname}</span>}
-                </LabelInputContainer>
-              </div>
+              <LabelInputContainer className="mb-4">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  placeholder="John Doe"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+                {errors.name && <span className="text-red-600 text-sm">{errors.name}</span>}
+              </LabelInputContainer>
               <LabelInputContainer className="mb-4">
                 <Label htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
-                  placeholder="iambatman@gotham.com"
+                  placeholder="johndoe@example.com"
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
@@ -313,6 +257,28 @@ function Signup() {
                   onChange={handleInputChange}
                 />
                 {errors.password && <span className="text-red-600 text-sm">{errors.password}</span>}
+              </LabelInputContainer>
+              <LabelInputContainer className="mb-4">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  placeholder="+1234567890"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                />
+                {errors.phone && <span className="text-red-600 text-sm">{errors.phone}</span>}
+              </LabelInputContainer>
+              <LabelInputContainer className="mb-4">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  placeholder="123 Main St, City, Country"
+                  type="text"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                />
+                {errors.address && <span className="text-red-600 text-sm">{errors.address}</span>}
               </LabelInputContainer>
             </>
           ) : (
@@ -376,7 +342,6 @@ const BottomGradient = () => {
     </>
   );
 };
-
 const LabelInputContainer = ({
   children,
   className,

@@ -3,12 +3,12 @@
 import { useUser } from "@/global/useUser";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import { IconBrandGoogle } from "@tabler/icons-react";
-import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { authService } from "../services/api.js";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-
 export function Login() {
   return (
     <GoogleOAuthProvider clientId="772509586103-5h4f5vu58sv9cqkon7jbq63m68nsoh5m.apps.googleusercontent.com">
@@ -23,33 +23,27 @@ function Signin() {
   const [errors, setErrors] = useState({ email: "", password: "" });
 
   const { setUser } = useUser();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/users/email`, { params: { email: formData.email } });
-      const user = res.data;
-      if (user.password.includes("googleusercontent")) {
-        setErrors({ ...errors, email: "Google account found. Please login with Google." });
-      } else {
-        const loginRes = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/users/login`, formData);
-        if (loginRes.status === 200) {
-          setUser({
-            name: user.firstname,
-            email: formData.email,
-            picture: "none",
-          });
-          navigate("/dashboard");
-        }
-      }
+      const token = await authService.login(formData.email, formData.password);
+      console.log("Login successful, token received:", token);
+
+      const decodedToken = jwtDecode(token);
+      
+      setUser({
+        email: decodedToken.sub as string, 
+        role: 'USER',
+        name: decodedToken.sub as string,
+        picture: "none"
+      });
+
+      navigate("/dashboard");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setErrors({ ...errors, email: "User not found" });
-      } else if (axios.isAxiosError(error) && error.response?.status === 401) {
-        setErrors({ ...errors, password: "Invalid password" });
-      } else {
-        console.error(`Error logging in:`, error);
-      }
+      console.error(`Error logging in:`, error);
+      setErrors({ ...errors, email: "Invalid email or password" });
     }
   };
 
@@ -59,24 +53,25 @@ function Signin() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const userInfo = await response.json();
-      const emailCheckResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/users/email`, {
-        params: { email: userInfo.email },
-      });
 
-      const user = emailCheckResponse.data;
-      console.log("Loginned user",user)
-      if (user.password.includes("googleusercontent")) {
+      try {
+        const token = await authService.login(userInfo.email, userInfo.sub);
+        const decodedToken = jwtDecode(token);
+        
         setUser({
+          email: decodedToken.sub as string,
+          role: 'USER',
           name: userInfo.name,
-          email: user.email,
-          picture: userInfo.picture,
+          picture: userInfo.picture
         });
+
         navigate("/dashboard");
-      } else {
-        setErrors({ ...errors, email: "Account wasn't created using Google. Enter credentials." });
+      } catch (error) {
+        console.error('Error logging in with Google:', error);
+        setErrors({ ...errors, email: "Failed to login with Google. Please try again." });
       }
     } catch (error) {
-      console.error('Error fetching user info or checking email existence:', error);
+      console.error('Error fetching user info:', error);
       setErrors({ ...errors, email: "An error occurred. Please try again." });
     }
   };
@@ -95,6 +90,7 @@ function Signin() {
     },
     onError: onError,
   });
+
 
   return (
     <div className="h-screen w-screen flex justify-center items-center">
