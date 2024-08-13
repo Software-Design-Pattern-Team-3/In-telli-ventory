@@ -5,5 +5,5 @@ RUN ls -l target/
 
 FROM openjdk:17.0.1-jdk-slim
 COPY --from=build /target/inventory-0.0.1-SNAPSHOT.jar demo.jar
-EXPOSE 7777
+EXPOSE 8080
 ENTRYPOINT ["java","-jar","demo.jar"]

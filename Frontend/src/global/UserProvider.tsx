@@ -25,7 +25,6 @@ export function UserProvider({ children }: UserProviderProps) {
     }
     setUser({ name: '', email: '', picture: '',role:'' });
     localStorage.removeItem('user');
-    localStorage.removeItem("token")
   };
 
   // Save user to localStorage whenever it changes

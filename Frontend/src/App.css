@@ -65,7 +65,14 @@
 .no-visible-scrollbar::-webkit-scrollbar {
   display: none;
 }
+.hide-scrollbar {
+  overflow: scroll; /* Allow scrolling */
+  scrollbar-width: none; /* For Firefox */
+}
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Edge */
+}
 .icon-btn {
   background: none;
   border: none;

@@ -1,6 +1,17 @@
 package com.backend.inventory.config;
 
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.HEAD;
+import static org.springframework.http.HttpMethod.OPTIONS;
+import static org.springframework.http.HttpMethod.PATCH;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
@@ -17,17 +28,6 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.HEAD;
-import static org.springframework.http.HttpMethod.OPTIONS;
-import static org.springframework.http.HttpMethod.PATCH;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,6 +48,9 @@ public class SecurityConfig {
                         "/swagger-ui.html/**",
                         "/api/admin/default",
                         "/v3/api-docs/**",
+                        "/users/send-otp/**",
+                        "/api/auth/register/**",
+                        "/api/auth/login/**"
                         
         };
 

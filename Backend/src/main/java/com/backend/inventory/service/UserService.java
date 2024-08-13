@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.inventory.exception.EmailAlreadyRegisteredException;
+import com.backend.inventory.model.Product;
 import com.backend.inventory.model.User;
 import com.backend.inventory.repository.UserRepository;
 
@@ -43,10 +44,11 @@ public class UserService {
     public User updateUser(long id, User user) {
         
         User existingUser = userRepository.findById(id).orElse(null);
-        existingUser.setFirstname(user.getFirstname());
-        existingUser.setLastname(user.getLastname());
+        existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(user.getPassword());
+        existingUser.setPhone(user.getPhone());
+        existingUser.setAddress(user.getAddress());
 
         return userRepository.save(existingUser);
 

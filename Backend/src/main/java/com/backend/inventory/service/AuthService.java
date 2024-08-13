@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +37,11 @@ public class AuthService {
             return "User already exists with email id " + registerRequest.getEmail();
         }
         var user = User.builder()
-                .firstname(registerRequest.getFirstname())
+                .name(registerRequest.getName())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .lastname(registerRequest.getLastname())
+                .phone(registerRequest.getPhone())
+                .address(registerRequest.getAddress())
                 .role(User.Role.USER)
                 .build();
         userRepository.save(user);
@@ -81,10 +83,11 @@ public class AuthService {
         }
 
         var user = User.builder()
-                .firstname("Admin")
-                .lastname("Admin")
+                .name("Admin")
                 .email("admin@gmail.com")
                 .password(passwordEncoder.encode("Admin@123"))
+                .phone("1234567890")
+                .address("xyz")
                 .role(User.Role.ADMIN)
                 .build();
         userRepository.save(user);

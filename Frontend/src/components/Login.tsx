@@ -1,21 +1,14 @@
+// Login.tsx
+"use client";
 import { useUser } from "@/global/useUser";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import { IconBrandGoogle } from "@tabler/icons-react";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { authService } from "../services/api.jsx";
+import { authService } from "../services/api.js";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-
-interface DecodedToken {
-  sub: string;
-  role: string;
-  name: string;
-  picture: string;
-}
-
 export function Login() {
   return (
     <GoogleOAuthProvider clientId="772509586103-5h4f5vu58sv9cqkon7jbq63m68nsoh5m.apps.googleusercontent.com">
@@ -25,29 +18,32 @@ export function Login() {
 }
 
 function Signin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "" });
+
   const { setUser } = useUser();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
-      const token = await authService.login(email, password);
+      const token = await authService.login(formData.email, formData.password);
       console.log("Login successful, token received:", token);
-      const decodedToken = jwtDecode<DecodedToken>(token);
+
+      const decodedToken = jwtDecode(token);
       
       setUser({
-        name: decodedToken.name || "",
-        email: decodedToken.sub,
-        picture: decodedToken.picture || "none",
-        role: decodedToken.role,
+        email: decodedToken.sub as string, 
+        role: 'USER',
+        name: decodedToken.sub as string,
+        picture: "none"
       });
+
       navigate("/dashboard");
     } catch (error) {
-      console.error("Login failed:", error);
-      setError(typeof error === 'string' ? error : "An error occurred during login");
+      console.error(`Error logging in:`, error);
+      setErrors({ ...errors, email: "Invalid email or password" });
     }
   };
 
@@ -57,38 +53,44 @@ function Signin() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const userInfo = await response.json();
-      const emailCheckResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/users/email`, {
-        params: { email: userInfo.email },
-      });
 
-      const user = emailCheckResponse.data;
-      console.log("Logged in user", user);
-      if (user.password.includes("googleusercontent")) {
+      try {
+        const token = await authService.login(userInfo.email, userInfo.sub);
+        const decodedToken = jwtDecode(token);
+        
         setUser({
+          email: decodedToken.sub as string,
+          role: 'USER',
           name: userInfo.name,
-          email: user.email,
-          picture: userInfo.picture,
-          role: user.role,
+          picture: userInfo.picture
         });
+
         navigate("/dashboard");
-      } else {
-        setError("Account wasn't created using Google. Enter credentials.");
+      } catch (error) {
+        console.error('Error logging in with Google:', error);
+        setErrors({ ...errors, email: "Failed to login with Google. Please try again." });
       }
     } catch (error) {
-      console.error('Error fetching user info or checking email existence:', error);
-      setError("An error occurred. Please try again.");
+      console.error('Error fetching user info:', error);
+      setErrors({ ...errors, email: "An error occurred. Please try again." });
     }
   };
 
-  const handleGoogleLogin = useGoogleLogin({
+  const onError = () => {
+    console.log('Login Failed');
+  };
+
+  const handleGoogleLogin = () => {
+    handleGoogle();
+  };
+
+  const handleGoogle = useGoogleLogin({
     onSuccess: tokenResponse => {
       fetchUserInfo(tokenResponse.access_token);
     },
-    onError: () => {
-      console.log('Google Login Failed');
-      setError("Google login failed. Please try again.");
-    },
+    onError: onError,
   });
+
 
   return (
     <div className="h-screen w-screen flex justify-center items-center">
@@ -98,16 +100,17 @@ function Signin() {
           Login to view inventory status and analytics.
         </p>
 
-        <form className="my-8" onSubmit={handleLogin}>
+        <form className="my-8" onSubmit={handleSubmit}>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="email">Email Address</Label>
             <Input
               id="email"
               placeholder="iambatman@gotham.com"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={e => setFormData({ ...formData, email: e.target.value })}
             />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="password">Password</Label>
@@ -115,11 +118,11 @@ function Signin() {
               id="password"
               placeholder="••••••••"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={e => setFormData({ ...formData, password: e.target.value })}
             />
+            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </LabelInputContainer>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
           <button
             className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
@@ -135,7 +138,7 @@ function Signin() {
             <button
               className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
               type="button"
-              onClick={() => handleGoogleLogin()}
+              onClick={handleGoogleLogin}
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-neutral-700 dark:text-neutral-300 text-sm">Google</span>
