@@ -226,112 +226,112 @@ function Signup() {
 
   return (
     <div className="h-screen w-screen flex justify-center items-center">
-      <Card className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Enter your details below to create your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
-            {!showOtp ? (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <LabelInputContainer>
-                    <Label htmlFor="firstname">First name</Label>
-                    <Input
-                      id="firstname"
-                      placeholder="John"
-                      type="text"
-                      value={formData.firstname}
-                      onChange={handleInputChange}
-                    />
-                    {errors.firstname && <span className="text-red-600 text-sm">{errors.firstname}</span>}
-                  </LabelInputContainer>
-                  <LabelInputContainer>
-                    <Label htmlFor="lastname">Last name</Label>
-                    <Input
-                      id="lastname"
-                      placeholder="Doe"
-                      type="text"
-                      value={formData.lastname}
-                      onChange={handleInputChange}
-                    />
-                    {errors.lastname && <span className="text-red-600 text-sm">{errors.lastname}</span>}
-                  </LabelInputContainer>
-                </div>
-                <LabelInputContainer className="mt-4">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    placeholder="johndoe@example.com"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                  {errors.email && <span className="text-red-600 text-sm">{errors.email}</span>}
-                </LabelInputContainer>
-                <LabelInputContainer className="mt-4">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    placeholder="••••••••"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                  />
-                  {errors.password && <span className="text-red-600 text-sm">{errors.password}</span>}
-                </LabelInputContainer>
-              </>
-            ) : (
-              <LabelInputContainer className="mt-4">
-                <Label htmlFor="otp">Enter OTP</Label>
+  <Card className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+    <CardHeader className="space-y-1">
+      <CardTitle className="text-2xl">Create an account</CardTitle>
+      <CardDescription>Enter your details below to create your account</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <form onSubmit={handleSubmit}>
+        {!showOtp ? (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <LabelInputContainer>
+                <Label htmlFor="firstname">First name</Label>
                 <Input
-                  id="otp"
-                  placeholder="Enter the OTP"
+                  id="firstname"
+                  placeholder="John"
                   type="text"
-                  value={userOtp}
-                  onChange={(e) => setUserOtp(e.target.value)}
+                  value={formData.firstname}
+                  onChange={handleInputChange}
                 />
-                {errors.otp && <span className="text-red-600 text-sm">{errors.otp}</span>}
+                {errors.firstname && <span className="text-red-600 text-sm">{errors.firstname}</span>}
               </LabelInputContainer>
-            )}
-            <Button
-              className="mt-6 w-full"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? "Registering..." : (showOtp ? "Verify OTP & Register" : "Register")}
-            </Button>
-          </form>
-        </CardContent>
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-        <CardFooter>
-          <Button
-            className="w-full"
-            variant="outline"
-            onClick={() => handleGoogleLogin()}
-          >
-            <IconBrandGoogle className="mr-2 h-4 w-4" />
-            Google
-          </Button>
-        </CardFooter>
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link to="/auth/login" className="underline">
-            Sign in
-          </Link>
-        </div>
-      </Card>
+              <LabelInputContainer>
+                <Label htmlFor="lastname">Last name</Label>
+                <Input
+                  id="lastname"
+                  placeholder="Doe"
+                  type="text"
+                  value={formData.lastname}
+                  onChange={handleInputChange}
+                />
+                {errors.lastname && <span className="text-red-600 text-sm">{errors.lastname}</span>}
+              </LabelInputContainer>
+            </div>
+            <LabelInputContainer className="mt-4">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                placeholder="johndoe@example.com"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+              {errors.email && <span className="text-red-600 text-sm">{errors.email}</span>}
+            </LabelInputContainer>
+            <LabelInputContainer className="mt-4">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                placeholder="••••••••"
+                type="password"
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+              {errors.password && <span className="text-red-600 text-sm">{errors.password}</span>}
+            </LabelInputContainer>
+          </>
+        ) : (
+          <LabelInputContainer className="mt-4">
+            <Label htmlFor="otp">Enter OTP</Label>
+            <Input
+              id="otp"
+              placeholder="Enter the OTP"
+              type="text"
+              value={userOtp}
+              onChange={(e) => setUserOtp(e.target.value)}
+            />
+            {errors.otp && <span className="text-red-600 text-sm">{errors.otp}</span>}
+          </LabelInputContainer>
+        )}
+        <Button
+          className="mt-6 w-full"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Registering..." : (showOtp ? "Verify OTP & Register" : "Register")}
+        </Button>
+      </form>
+    </CardContent>
+    <div className="relative my-4">
+      <div className="absolute inset-0 flex items-center">
+        <span className="w-full border-t" />
+      </div>
+      <div className="relative flex justify-center text-xs uppercase">
+        <span className="bg-background px-2 text-muted-foreground">
+          Or continue with
+        </span>
+      </div>
     </div>
+    <CardFooter>
+      <Button
+        className="w-full"
+        variant="outline"
+        onClick={() => handleGoogleLogin()}
+      >
+        <IconBrandGoogle className="mr-2 h-4 w-4" />
+        Google
+      </Button>
+    </CardFooter>
+    <div className="mt-4 text-center text-sm">
+      Already have an account?{" "}
+      <Link to="/auth/login" className="underline">
+        Sign in
+      </Link>
+    </div>
+  </Card>
+</div>
   );
 }
 
