@@ -5,6 +5,7 @@ interface User {
   name: string;
   email: string;
   picture: string;
+  role:string;
 }
 
 interface UserProviderProps {
@@ -22,8 +23,9 @@ export function UserProvider({ children }: UserProviderProps) {
     if (user.picture.includes("google")){
       googleLogout();
     }
-    setUser({ name: '', email: '', picture: '' });
+    setUser({ name: '', email: '', picture: '',role:'' });
     localStorage.removeItem('user');
+    localStorage.removeItem("token")
   };
 
   // Save user to localStorage whenever it changes

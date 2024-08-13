@@ -34,8 +34,7 @@ public class UserController {
     @Autowired
     private EmailService emailService;
 
-    // ... existing methods ...
-
+    
     
 
     @PostMapping
@@ -87,10 +86,10 @@ public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
 }
 
 
-@GetMapping("/cron")
-public ResponseEntity<String> getUserByCron() {
-    return new ResponseEntity<>("Hi There", HttpStatus.OK);
-}
+// @GetMapping("/cron")
+// public ResponseEntity<String> getUserByCron() {
+//     return new ResponseEntity<>("Hi There", HttpStatus.OK);
+// }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable long id) {
@@ -104,25 +103,25 @@ public ResponseEntity<String> getUserByCron() {
         }
 
     }
-    @PostMapping("/login")
-public ResponseEntity<?> loginUser(@RequestBody Map<String, String> credentials) {
-    String email = credentials.get("email");
-    String password = credentials.get("password");
+//     @PostMapping("/login")
+// public ResponseEntity<?> loginUser(@RequestBody Map<String, String> credentials) {
+//     String email = credentials.get("email");
+//     String password = credentials.get("password");
 
-    try {
-        User user = userService.getUserByEmail(email);
-        if (user == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-        if (user.getPassword().equals(password)) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
-        }
-    } catch (Exception e) {
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-}
+//     try {
+//         User user = userService.getUserByEmail(email);
+//         if (user == null) {
+//             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+//         }
+//         if (user.getPassword().equals(password)) {
+//             return new ResponseEntity<>(user, HttpStatus.OK);
+//         } else {
+//             return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
+//         }
+//     } catch (Exception e) {
+//         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//     }
+// }
 
 
 @PutMapping("/{id}")
@@ -154,21 +153,21 @@ public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody User 
 
     
 
-    @PostMapping("/send-otp")
-    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
-        String otp = body.get("otp");
+    // @PostMapping("/send-otp")
+    // public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
+    //     String email = body.get("email");
+    //     String otp = body.get("otp");
 
-        if (email == null || otp == null) {
-            return new ResponseEntity<>("Email and OTP are required", HttpStatus.BAD_REQUEST);
-        }
+    //     if (email == null || otp == null) {
+    //         return new ResponseEntity<>("Email and OTP are required", HttpStatus.BAD_REQUEST);
+    //     }
 
-        try {
-            emailService.sendOtpEmail(email, otp);
-            return new ResponseEntity<>("OTP sent successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to send OTP: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    //     try {
+    //         emailService.sendOtpEmail(email, otp);
+    //         return new ResponseEntity<>("OTP sent successfully", HttpStatus.OK);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Failed to send OTP: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
 }
