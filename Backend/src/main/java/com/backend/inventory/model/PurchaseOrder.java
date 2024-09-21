@@ -22,18 +22,19 @@ public class PurchaseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
-
+    
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
-
+    
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-
+    
     private Date orderDate;
     private int quantity;
     private String status;
     private float total_cost;
 
+    
 }

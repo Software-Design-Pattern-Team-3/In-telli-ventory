@@ -5,7 +5,6 @@ interface User {
   name: string;
   email: string;
   picture: string;
-  role:string;
 }
 
 interface UserProviderProps {
@@ -23,7 +22,7 @@ export function UserProvider({ children }: UserProviderProps) {
     if (user.picture.includes("google")){
       googleLogout();
     }
-    setUser({ name: '', email: '', picture: '',role:'' });
+    setUser({ name: '', email: '', picture: '' });
     localStorage.removeItem('user');
   };
 

@@ -44,11 +44,10 @@ public class UserService {
     public User updateUser(long id, User user) {
         
         User existingUser = userRepository.findById(id).orElse(null);
-        existingUser.setName(user.getName());
+        existingUser.setFirstname(user.getFirstname());
+        existingUser.setLastname(user.getLastname());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(user.getPassword());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setAddress(user.getAddress());
 
         return userRepository.save(existingUser);
 
