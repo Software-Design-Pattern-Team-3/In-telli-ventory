@@ -58,37 +58,50 @@ export default function SidebarDemo() {
   const links: Links[] = [
     {
       label: theme === "light" ? "Dark Mode" : "Light Mode",
-      icon: theme === "light" ? <IconMoon className="text-neutral-700 dark:text-neutral-200 h-5 w-5" /> : <IconSun className="text-neutral-700 dark:text-neutral-200 h-5 w-5" />,
+      icon:
+        theme === "light" ? (
+          <IconMoon className="text-neutral-700 dark:text-neutral-200 h-5 w-5" />
+        ) : (
+          <IconSun className="text-neutral-700 dark:text-neutral-200 h-5 w-5" />
+        ),
       onClick: toggleTheme,
-      type: 'button',
+      type: "button",
     },
     {
       label: "Dashboard",
       href: "/dashboard",
-      icon: <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
-      type: 'link',
+      icon: (
+        <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+      type: "link",
     },
     {
       label: "Profile",
       href: "/admin",
-      icon: <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
-      type: 'link',
+      icon: (
+        <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+      type: "link",
     },
     {
       label: "Settings",
       href: "/settings",
-      icon: <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
-      type: 'link',
+      icon: (
+        <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+      type: "link",
     },
     {
       label: "Logout",
-      icon: <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      icon: (
+        <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
       onClick: (e: any) => {
         e.preventDefault();
         logout();
         navigate("/auth/login");
       },
-      type: 'button',
+      type: "button",
     },
   ];
 
@@ -136,7 +149,7 @@ export default function SidebarDemo() {
                 label: user.name,
                 href: "#",
                 icon: getAvatar(),
-                type: 'link',
+                type: "link",
               }}
             />
           </div>
@@ -153,7 +166,7 @@ export const Logo = () => {
       to="/"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      {/* <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" /> */}
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -177,36 +190,44 @@ export const LogoIcon = () => {
 };
 
 const Dashboard: React.FC = () => {
-  const [saleCount,setSaleCount] = useState(0)
-  const [productCount,setProductCount]  =useState(0)
-  const [poCount,setPOCount] = useState(0)
-  const [supplierCount,setSupplierCount] = useState(0)
-  useEffect(()=>{
-    const fetchSalesCount = async() =>{
-      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/sales/count`)
-      setSaleCount(count.data)
-    }
+  const [saleCount, setSaleCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
+  const [poCount, setPOCount] = useState(0);
+  const [supplierCount, setSupplierCount] = useState(0);
+  useEffect(() => {
+    const fetchSalesCount = async () => {
+      const count = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/api/sales/count`
+      );
+      setSaleCount(count.data);
+    };
 
-    fetchSalesCount()
-    const fetchProductCount = async() =>{
-      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/products/count`)
-      setProductCount(count.data)
-    }
+    fetchSalesCount();
+    const fetchProductCount = async () => {
+      const count = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/products/count`
+      );
+      setProductCount(count.data);
+    };
 
-    fetchProductCount()
-    const fetchPOCount = async() =>{
-      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/purchase-orders/count`)
-      setPOCount(count.data)
-    }
+    fetchProductCount();
+    const fetchPOCount = async () => {
+      const count = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/api/purchase-orders/count`
+      );
+      setPOCount(count.data);
+    };
 
-    fetchPOCount()
-    const fetchSupplierCount = async() =>{
-      const count = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/suppliers/count`)
-      setSupplierCount(count.data)
-    }
+    fetchPOCount();
+    const fetchSupplierCount = async () => {
+      const count = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/api/suppliers/count`
+      );
+      setSupplierCount(count.data);
+    };
 
-    fetchSupplierCount()
-  })
+    fetchSupplierCount();
+  });
   const cards: Card[] = [
     {
       description: "Total number of sales",
@@ -215,12 +236,14 @@ const Dashboard: React.FC = () => {
       ctaLink: "https://your-link-here.com/sales",
       content: () => (
         <p>
-          The total number of sales this month is a key indicator of the business's performance.
-          It's crucial to monitor this metric to ensure the business is on track to meet its targets.
+          The total number of sales this month is a key indicator of the
+          business's performance. It's crucial to monitor this metric to ensure
+          the business is on track to meet its targets.
           <br />
           <br />
-          Monitoring sales trends helps in forecasting and planning for future inventory needs,
-          ensuring that popular products are always in stock and slow-moving items are identified.
+          Monitoring sales trends helps in forecasting and planning for future
+          inventory needs, ensuring that popular products are always in stock
+          and slow-moving items are identified.
         </p>
       ),
     },
@@ -231,11 +254,13 @@ const Dashboard: React.FC = () => {
       ctaLink: "https://your-link-here.com/inventory",
       content: () => (
         <p>
-          Keeping track of current stock levels is essential for inventory management. 
-          It helps in maintaining an optimal stock level, reducing the holding cost, and avoiding stockouts or overstock situations.
+          Keeping track of current stock levels is essential for inventory
+          management. It helps in maintaining an optimal stock level, reducing
+          the holding cost, and avoiding stockouts or overstock situations.
           <br />
           <br />
-          Regularly updating stock information ensures accurate data is available for making informed decisions.
+          Regularly updating stock information ensures accurate data is
+          available for making informed decisions.
         </p>
       ),
     },
@@ -246,10 +271,12 @@ const Dashboard: React.FC = () => {
       ctaLink: "https://your-link-here.com/reorders",
       content: () => (
         <p>
-          Identifying products that need to be reordered helps in maintaining continuous availability of products.
+          Identifying products that need to be reordered helps in maintaining
+          continuous availability of products.
           <br />
           <br />
-          Timely reordering prevents stockouts and ensures customer satisfaction by meeting demand without delay.
+          Timely reordering prevents stockouts and ensures customer satisfaction
+          by meeting demand without delay.
         </p>
       ),
     },
@@ -260,10 +287,12 @@ const Dashboard: React.FC = () => {
       ctaLink: "https://your-link-here.com/inventory-value",
       content: () => (
         <p>
-          The total value of current inventory provides insights into the capital tied up in stock.
+          The total value of current inventory provides insights into the
+          capital tied up in stock.
           <br />
           <br />
-          It helps in evaluating the financial health of the business and planning for future investments.
+          It helps in evaluating the financial health of the business and
+          planning for future investments.
         </p>
       ),
     },
@@ -277,13 +306,11 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
       <div className="grid gap-8 md:grid-cols- lg:grid-cols-3 py-4">
-       
-          <BarChartDash />
-        
-          <AreaChartDash />
-        
-          <PieChartDash />
-        
+        <BarChartDash />
+
+        <AreaChartDash />
+
+        <PieChartDash />
       </div>
       <div className="">
         <InAreaChartDash />
