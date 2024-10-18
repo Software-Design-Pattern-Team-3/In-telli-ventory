@@ -1,1 +1,1 @@
-# Intelligent Inventory Management 
+# Intelligent Inventory Management - StockSync
