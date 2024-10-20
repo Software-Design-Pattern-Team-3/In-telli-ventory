@@ -56,7 +56,6 @@ result = client.predict(
 )
 print(result)
 ```
-=======
-# Intelligent Inventory Management
+
 
 
