@@ -1,3 +1,4 @@
+
 # Intelligent Inventory Management - StockSync
 
 
@@ -55,3 +56,7 @@ result = client.predict(
 )
 print(result)
 ```
+=======
+# Intelligent Inventory Management
+
+
